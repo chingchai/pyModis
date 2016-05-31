@@ -1,0 +1,201 @@
+[test_pymodis]
+ Title = modis_download.py
+ Abstract = downloads MODIS data from NASA FTP servers. It can download large amounts of data and it can be profitably used with cron jobs to receive data with a fixed delay of time.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = test_pymodis
+ serviceType = Python
+<MetaData>
+ title = Demo pyModis imagery download.
+</MetaData>
+
+ <DataInputs>
+ 
+   [dns]
+   Title = destinationFolder
+   Abstract = where the files will be stored
+   minOccurs = 1
+   maxOccurs = 1
+   <MetaData>
+    title = demo
+   </MetaData>
+   <LiteralData>
+    dataType = string
+    <Default>
+    uom = meters
+    </Default>
+    <Supported>
+    uom = feet
+    </Supported>
+   </LiteralData>
+   
+   [pwd]
+   Title = the password
+   Abstract = It should be your email address to connect to a FTP server. Do not use this variable if the server is an HTTP server
+   minOccurs = 1
+   maxOccurs = 1
+   <MetaData>
+    title = demo
+   </MetaData>
+   <LiteralData>
+    dataType = string
+    <Default>
+    uom = meters
+    </Default>
+    <Supported>
+    uom = feet
+    </Supported>
+   </LiteralData>
+
+   [usr]
+   Title = the user name
+   Abstract = Default 'anonymous', used to connect to an FTP server. Do not use this variable if the server is an HTTP server
+   minOccurs = 1
+   maxOccurs = 1
+   <MetaData>
+    title = demo
+   </MetaData>
+   <LiteralData>
+    dataType = string
+    <Default>
+    uom = meters
+    </Default>
+    <Supported>
+    uom = feet
+    </Supported>
+   </LiteralData>   
+ 
+  [path]
+   Title = the directory where the data that you want to download are stored on the FTP server.
+   Abstract = directory on the http/ftp [default=MOLT](-s  --source[-s MOLA]).
+   minOccurs = 1
+   maxOccurs = 1
+   <MetaData>
+    title = demo
+   </MetaData>
+   <LiteralData>
+    dataType = string
+    <Default>
+    uom = meters
+    </Default>
+    <Supported>
+    uom = feet
+    </Supported>
+   </LiteralData>
+
+  [product]
+   Title = the code of the product to download.
+   Abstract = product name as on the http/ftp server. (-p  --product[-p MYD11A1.005])
+   minOccurs = 1
+   maxOccurs = 1
+   <MetaData>
+    title = demo
+   </MetaData>
+   <LiteralData>
+    dataType = string
+    <Default>
+    uom = meters
+    </Default>
+    <Supported>
+    uom = feet
+    </Supported>
+   </LiteralData>   
+   
+  [tiles]
+   Title = a set of tiles to be downloaded. None == all
+   Abstract =  tiles.This can be passed as a string of tileIDs separated by commas, or as a list of individual tileIDs(-t  --tiles[-t h18v03,h18v04]
+   minOccurs = 1
+   maxOccurs = 1
+   <MetaData>
+    title = demo
+   </MetaData>
+   <LiteralData>
+    dataType = string
+    <Default>
+    uom = meters
+    </Default>
+    <Supported>
+    uom = feet
+    </Supported>
+   </LiteralData>
+
+  [today]
+   Title = the day to start downloading.    
+   Abstract = the day to start download, if you want change data you have to use this format YYYY-MM-DD ([default=none] is for today).
+   minOccurs = 1
+   maxOccurs = 1
+   <MetaData>
+    title = hint -f  --firstday[-f 2008-01-01].
+   </MetaData>
+   <LiteralData>
+    dataType = string
+    <Default>
+    uom = meters
+    </Default>
+    <Supported>
+    uom = feet
+    </Supported>
+   </LiteralData>
+
+  [enddate]
+   Title = the day to end downloading. 
+   Abstract = day to finish download, if you want change data you have to use this format YYYY-MM-DD ([default=none] use delta option) 
+   minOccurs = 1
+   maxOccurs = 1
+   <MetaData>
+    title = hint -e  --enddaythe[-e 2008-01-31].
+   </MetaData>
+   <LiteralData>
+    dataType = string
+    <Default>
+    uom = meters
+    </Default>
+    <Supported>
+    uom = feet
+    </Supported>
+   </LiteralData>
+ </DataInputs>
+ 
+ <DataOutputs>
+  [Result]
+   Title = modis_download.py
+   Abstract = modis_download.py output
+   <ComplexData>
+   <Default>
+   mimeType = text/html
+   encoding = UTF-8
+   schema = 
+   </Default>
+   <Supported>
+   mimeType = text/csv
+   encoding = UTF-8
+   schema = http://schemas.opengis.net/gml/3.1.0/base/feature.xsd
+   useMapserver = false
+   </Supported>
+   <Supported>
+   mimeType = image/png
+   useMapserver = true
+   asReference = true
+   msStyle = STYLE COLOR 125 0 105 OUTLINECOLOR 0 0 0 WIDTH 3 END
+   </Supported>
+   <Supported>
+   mimeType = image/jpg
+   useMapserver = true
+   asReference = true
+   msStyle = STYLE COLOR 125 0 105 OUTLINECOLOR 0 0 0 WIDTH 3 END
+   </Supported>   
+   <Supported>
+   mimeType = image/tif
+   useMapserver = false
+   asReference = false
+   msClassify = ....
+   </Supported>
+   <Supported>
+   mimeType = image/hdf
+   useMapserver = false
+   asReference = false
+   msClassify = ....
+   </Supported>   
+   </ComplexData>
+ </DataOutputs>
