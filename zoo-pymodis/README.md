@@ -1,4 +1,4 @@
-﻿# Bringing pyModis to the web through ZOO-Project(GSoC 2016)
+﻿#Bringing pyModis to the web through ZOO-Project(GSoC 2016)
 
 The pyModis project has been developed and used to work with MODIS data, it provides wxPython user interfaces which are able to download and process data using pyModis scripts. pyModis depends on a desktop graphical user interface which does not make it directly usable from a web application. The idea of this GSoC proposal is to bring pyModis to the web by publishing Python Web Processing Services using the ZOO-Project technology accessible through a minimal web application.
 An idea which can be implemented for the future, based on this initial work, include the creation of new services by combining pyModis, GRASS, OTB and SAGA-GIS services.
@@ -75,13 +75,47 @@ sudo pip install --upgrade --trusted-host wxpython.org --pre -f http://wxpython.
 ### Test module modis_download.py
 ```
 modis_download.py -r -t h27v07 -s MOTA - MCD43B4.005 -f 2015-01-01 -e 2015-01-30 ~/Download/lab-pyModis/modis-thailand
+
+# Result:
+listfileMCD43B4.005.txt
+MCD43B4.A2015001.h27v07.005.2015027221605.hdf
+MCD43B4.A2015001.h27v07.005.2015027221605.hdf.xml
+MCD43B4.A2015009.h27v07.005.2015028132054.hdf
+MCD43B4.A2015009.h27v07.005.2015028132054.hdf.xml
+MCD43B4.A2015017.h27v07.005.2015034104800.hdf
+MCD43B4.A2015017.h27v07.005.2015034104800.hdf.xml
+MCD43B4.A2015025.h27v07.005.2015044141504.hdf
+MCD43B4.A2015025.h27v07.005.2015044141504.hdf.xml
+modisMCD43B4.005.log
 ```
+##Implementing the Python Service
+### create WPS service from downmodis module
+  - pymodis-services/cgi-env/modisdownload.py
+  - pymodis-services/cgi-env/modisdownload.zcfg
 
+```python
+  import zoo
+  import sys
+  import glob
+  from pymodis import downmodis
 
+  def modisdownload(conf,inputs,outputs):
+      # data download
+      dns = inputs["dns"]["value"] #dest = "/home/chingchai/lab-pyModis/lst_terra/"
+      path = inputs["path"]["value"] # MOLA, MOLT or MOTA
+      tiles = inputs["tiles"]["value"] #"h27v07,h27v08,h28v07,h28v08" Thailand extent
+      today = inputs["today"]["value"] #"2015-01-01"
+      enddate = inputs["enddate"]["value"] #"2015-01-30"
+      product = inputs["product"]["value"] #"MCD43B4.005","MOD11A1.005"
+      #result = glob.glob(dns + '*.hdf')
+      down = downmodis.downModis(destinationFolder=dns, url='http://e4ftl01.cr.usgs.gov', path=path, tiles=tiles, today=today, enddate=enddate, product=product)
+      down.connect()
+      down.downloadsAllDay()
 
-
-
-
+      outputs["Result"]["value"]=\
+              "dns: "+inputs["dns"]["value"]+ " path: "+inputs["path"]["value"]+ " tiles: "+inputs["tiles"]["value"]+ " today: "+inputs["today"]["value"]+ " enddate: "+inputs["enddate"]["value"]+ " product: "+inputs["product"]["value"]+ str(glob.glob(dns + '*.hdf'))
+      return zoo.SERVICE_SUCCEEDED
+```
 
 ## ZOO Wiki
   - [ZOO-Wiki](http://zoo-project.org/trac/wiki/Bringing_pyModis_to_the_web_through_ZOO-Project_GSoC_2016)
