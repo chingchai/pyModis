@@ -4,7 +4,7 @@ The pyModis project has been developed and used to work with MODIS data, it prov
 An idea which can be implemented for the future, based on this initial work, include the creation of new services by combining pyModis, GRASS, OTB and SAGA-GIS services.
 
 ## Notes
-  - pymodis-services/cgi-env (main project)
+  - [pymodis-services/cgi-env (main project)] (https://github.com/chingchai/pyModis/tree/gsoc-2016/zoo-pymodis/pymodis-services/cgi-env)
   - example-services/cgi-env
   - zoo-services
 
@@ -460,6 +460,9 @@ Execute: http://localhost/cgi-bin/mm/zoo_loader.cgi?request=Execute&service=WPS&
     </wps:ProcessOutputs>
 </wps:ExecuteResponse>
 ```
+![screenshot](https://wiki.osgeo.org/images/a/ab/Modis-testonweb.png "Test downmodis module to download MODIS Data as a WPS service")
+
+![screenshot](https://wiki.osgeo.org/images/b/bd/Modisdown-resul.png "Result downmodis module")
 
 ## ZOO Wiki
   - [ZOO-Wiki](http://zoo-project.org/trac/wiki/Bringing_pyModis_to_the_web_through_ZOO-Project_GSoC_2016)
