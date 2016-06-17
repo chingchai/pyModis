@@ -11,12 +11,12 @@ An idea which can be implemented for the future, based on this initial work, inc
 ## Install
 ### Install ZOO-Project@MapMint
 ####Python packages and modules
-  Before you can install MapMint using Ansible scripts, it is necessary to ensure the presence of some Ubuntu packages and specific Python modules.
-      ```
-      sudo apt-get install git python-setuptools openssh-server
-      sudo easy_install pip
-      sudo pip install paramiko PyYAML Jinja2 httplib2 six
-      ```
+Before you can install MapMint using Ansible scripts, it is necessary to ensure the presence of some Ubuntu packages and specific Python modules.
+```
+sudo apt-get install git python-setuptools openssh-server
+sudo easy_install pip
+sudo pip install paramiko PyYAML Jinja2 httplib2 six
+```
 
 ## ZOO Wiki
   - [ZOO-Wiki](http://zoo-project.org/trac/wiki/Bringing_pyModis_to_the_web_through_ZOO-Project_GSoC_2016)
