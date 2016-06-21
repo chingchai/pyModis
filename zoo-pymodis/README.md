@@ -464,6 +464,20 @@ Execute: http://localhost/cgi-bin/mm/zoo_loader.cgi?request=Execute&service=WPS&
 
 ![screenshot](https://wiki.osgeo.org/images/b/bd/Modisdown-resul.png "Result downmodis module")
 
+### create WPS service from convertmodis module
+Convert MODIS HDF file to GeoTiff file or create a HDF mosaic file for several tiles using Modis Reprojection Tools.
+- convertModis
+- createMosaic
+- processModis
+
+
+### create WPS service from convertmodis_gdal module
+Convert MODIS HDF file using GDAL Python bindings. It can create GeoTiff file (or other GDAL supported formats) or HDF mosaic file for several tiles.
+- file_info
+- createMosaicGDAL
+- convertModisGDAL
+
+
 ## ZOO Wiki
   - [ZOO-Wiki](http://zoo-project.org/trac/wiki/Bringing_pyModis_to_the_web_through_ZOO-Project_GSoC_2016)
   - [OSGeo-Wiki](https://wiki.osgeo.org/wiki/Bringing_pyModis_to_the_web_through_ZOO-Project_GSoC_2016)
