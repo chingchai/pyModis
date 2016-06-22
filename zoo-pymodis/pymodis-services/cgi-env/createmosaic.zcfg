@@ -1,0 +1,99 @@
+[createmosaic]
+ Title = createMosaicGDAL
+ Abstract = mosaic modis data from hdf to GDAL formats using GDAL.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = createmosaic
+ serviceType = Python
+<MetaData>
+ title = Demo pyModis creates a mosaic of several MODIS tiles in HDF format, using GDAL library
+</MetaData>
+
+ <DataInputs>
+
+   [hdfnames]
+   Title = a list containing the name of tile to mosaic
+   Abstract =
+   minOccurs = 1
+   maxOccurs = 1
+   <MetaData>
+    title = demo
+   </MetaData>
+   <LiteralData>
+    dataType = list
+    <Default>
+    uom = meters
+    </Default>
+    <Supported>
+    uom = feet
+    </Supported>
+   </LiteralData>
+
+   [subset]
+    Title = the subset to consider
+    Abstract = SUBSET (Required) a subset of product's layers. The string should be similar to: ( 1 0 )
+    minOccurs = 1
+    maxOccurs = 1
+    <MetaData>
+     title = demo
+    </MetaData>
+    <LiteralData>
+     dataType = string
+     <Default>
+     uom = meters
+     </Default>
+     <Supported>
+     uom = feet
+     </Supported>
+    </LiteralData>
+
+   [outformat]
+   Title = the output format to use, this parameter is not used for the VRT output, supported values are HDF4Image, GTiff, HFA, and maybe something else not tested.
+   Abstract =
+   minOccurs = 1
+   maxOccurs = 1
+   <MetaData>
+    title = demo
+   </MetaData>
+   <LiteralData>
+    dataType = string
+    <Default>
+    uom = meters
+    </Default>
+    <Supported>
+    uom = feet
+    </Supported>
+   </LiteralData>
+ </DataInputs>
+
+ <DataOutputs>
+  [Result]
+   Title = modis_mosaic.py
+   Abstract = modis_mosaic.py output
+   <ComplexData>
+   <Default>
+   mimeType = text/html
+   encoding = UTF-8
+   schema =
+   </Default>
+   <Supported>
+   mimeType = text/csv
+   encoding = UTF-8
+   schema = http://schemas.opengis.net/gml/3.1.0/base/feature.xsd
+   useMapserver = false
+   </Supported>
+   <Supported>
+   mimeType = image/tif
+   useMapserver = false
+   asReference = false
+   msClassify = ....
+   </Supported>
+   <Supported>
+   mimeType = image/hdf
+   useMapserver = false
+   asReference = false
+   msClassify = ....
+   </Supported>
+   </ComplexData>
+ </DataOutputs>
