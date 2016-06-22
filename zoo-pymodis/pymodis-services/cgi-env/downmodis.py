@@ -4,7 +4,7 @@ import glob
 
 from pymodis import downmodis
 
-def modisdownload(conf,inputs,outputs):
+def downmodis(conf,inputs,outputs):
     # data download
     dns = inputs["dns"]["value"] #dest = "/home/chingchai/lab-pyModis/lst_terra/"
     path = inputs["path"]["value"] # MOLA, MOLT or MOTA

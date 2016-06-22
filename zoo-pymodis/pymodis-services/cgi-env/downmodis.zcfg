@@ -1,10 +1,10 @@
-[modisdownload]
+[downmodis]
  Title = modis_download
  Abstract = downloads MODIS data from NASA FTP servers. It can download large amounts of data and it can be profitably used with cron jobs to receive data with a fixed delay of time.
  processVersion = 2
  storeSupported = true
  statusSupported = true
- serviceProvider = modisdownload
+ serviceProvider = downmodis
  serviceType = Python
 <MetaData>
  title = Demo pyModis imagery download.
