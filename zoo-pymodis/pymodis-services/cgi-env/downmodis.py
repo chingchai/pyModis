@@ -1,7 +1,7 @@
 import zoo
 import sys
 import glob
-
+#import pymodis
 from pymodis import downmodis
 
 def downmodis(conf,inputs,outputs):
@@ -18,5 +18,6 @@ def downmodis(conf,inputs,outputs):
     down.downloadsAllDay()
 
     outputs["Result"]["value"]=\
-            "dns: "+inputs["dns"]["value"]+ " path: "+inputs["path"]["value"]+ " tiles: "+inputs["tiles"]["value"]+ " today: "+inputs["today"]["value"]+ " enddate: "+inputs["enddate"]["value"]+ " product: "+inputs["product"]["value"]+ str(glob.glob(dns + '*.hdf'))
+            "destinationFolder: "+inputs["dns"]["value"]+ " path: "+inputs["path"]["value"]+ " tiles: "+inputs["tiles"]["value"]+\
+            " today: "+inputs["today"]["value"]+ " enddate: "+inputs["enddate"]["value"]+ " product: "+inputs["product"]["value"]+ str(glob.glob(dns + '*.hdf'))
     return zoo.SERVICE_SUCCEEDED
