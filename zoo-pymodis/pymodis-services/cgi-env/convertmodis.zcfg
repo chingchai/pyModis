@@ -1,0 +1,207 @@
+[convertmodis]
+ Title = convertmodis module
+ Abstract = Convert MODIS HDF file using GDAL Python bindings. It can create GeoTiff file (or other GDAL supported formats) or HDF mosaic file for several tiles.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = convertmodis
+ serviceType = Python
+<MetaData>
+ title = Demo pyModis convertmodis.
+</MetaData>
+
+ <DataInputs>
+
+   [hdfname]
+   Title = name of input data
+   Abstract = where the files will be stored
+   minOccurs = 1
+   maxOccurs = 1
+   <MetaData>
+    title = demo
+   </MetaData>
+   <LiteralData>
+    dataType = string
+    <Default>
+    uom = meters
+    </Default>
+    <Supported>
+    uom = feet
+    </Supported>
+   </LiteralData>
+
+   [prefix]
+   Title = prefix for output data
+   Abstract = output data
+   minOccurs = 1
+   maxOccurs = 1
+   <MetaData>
+    title = demo
+   </MetaData>
+   <LiteralData>
+    dataType = string
+    <Default>
+    uom = meters
+    </Default>
+    <Supported>
+    uom = feet
+    </Supported>
+   </LiteralData>
+
+  [subset]
+   Title = the subset to consider
+   Abstract = SUBSET (Required) a subset of product's layers. The string should be similar to: ( 1 0 )
+   minOccurs = 1
+   maxOccurs = 1
+   <MetaData>
+    title = demo
+   </MetaData>
+   <LiteralData>
+    dataType = string
+    <Default>
+    uom = meters
+    </Default>
+    <Supported>
+    uom = feet
+    </Supported>
+   </LiteralData>
+
+   [res]
+    Title = output resolution
+    Abstract =
+    minOccurs = 1
+    maxOccurs = 1
+    <MetaData>
+     title = demo
+    </MetaData>
+    <LiteralData>
+     dataType = int
+     <Default>
+     uom = meters
+     </Default>
+     <Supported>
+     uom = feet
+     </Supported>
+    </LiteralData>
+
+  [outformat]
+   Title = output format, it is possible to use all the supported GDAL format
+   Abstract =
+   minOccurs = 1
+   maxOccurs = 1
+   <MetaData>
+    title = demo
+   </MetaData>
+   <LiteralData>
+    dataType = string
+    <Default>
+    uom = meters
+    </Default>
+    <Supported>
+    uom = feet
+    </Supported>
+   </LiteralData>
+
+  [epsg]
+   Title = the EPSG code for the preojection of output file
+   Abstract =
+   minOccurs = 1
+   maxOccurs = 1
+   <MetaData>
+    title = demo
+   </MetaData>
+   <LiteralData>
+    dataType = string
+    <Default>
+    uom = meters
+    </Default>
+    <Supported>
+    uom = feet
+    </Supported>
+   </LiteralData>
+
+  [wkt]
+   Title = the WKT string for the preojection of output file
+   Abstract =
+   minOccurs = 1
+   maxOccurs = 1
+   <MetaData>
+    title = demo
+   </MetaData>
+   <LiteralData>
+    dataType = string
+    <Default>
+    uom = meters
+    </Default>
+    <Supported>
+    uom = feet
+    </Supported>
+   </LiteralData>
+
+  [resampl]
+   Title = the resampling method to use
+   Abstract =
+   minOccurs = 1
+   maxOccurs = 1
+   <MetaData>
+    title = demo
+   </MetaData>
+   <LiteralData>
+    dataType = string
+    <Default>
+    uom = meters
+    </Default>
+    <Supported>
+    uom = feet
+    </Supported>
+   </LiteralData>
+
+   [vrt]
+    Title = True to read GDAL VRT file created with createMosaicGDAL
+    Abstract =
+    minOccurs = 1
+    maxOccurs = 1
+    <MetaData>
+     title = demo
+    </MetaData>
+    <LiteralData>
+     dataType = boolean
+     <Default>
+     uom = meters
+     </Default>
+     <Supported>
+     uom = feet
+     </Supported>
+    </LiteralData>
+ </DataInputs>
+
+ <DataOutputs>
+  [Result]
+   Title = modis_convert.py
+   Abstract = modis_convert.py output
+   <ComplexData>
+   <Default>
+   mimeType = text/html
+   encoding = UTF-8
+   schema =
+   </Default>
+   <Supported>
+   mimeType = text/csv
+   encoding = UTF-8
+   schema = http://schemas.opengis.net/gml/3.1.0/base/feature.xsd
+   useMapserver = false
+   </Supported>
+   <Supported>
+   mimeType = image/tif
+   useMapserver = false
+   asReference = false
+   msClassify = ....
+   </Supported>
+   <Supported>
+   mimeType = image/hdf
+   useMapserver = false
+   asReference = false
+   msClassify = ....
+   </Supported>
+   </ComplexData>
+ </DataOutputs>
