@@ -15,19 +15,17 @@
   [path]
    Title = the directory where the data that you want to download are stored on the FTP server.
    Abstract = directory on the http/ftp [default=MOLT](source type: MOLA, MOLT or MOTA).
-   minOccurs = 1
+   minOccurs = 0
    maxOccurs = 1
    <MetaData>
     title = demo
    </MetaData>
    <LiteralData>
     dataType = string
+    AllowedValues = MOLA,MOLT,MOTA
     <Default>
-    uom = meters
+     value = MOLT
     </Default>
-    <Supported>
-    uom = feet
-    </Supported>
    </LiteralData>
 
   [product]
