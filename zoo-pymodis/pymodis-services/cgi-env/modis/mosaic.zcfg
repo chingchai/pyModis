@@ -1,0 +1,44 @@
+[mosaic]
+ Title = modis_mosaic
+ Abstract = mosaic modis data from hdf to GDAL formats using GDAL.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = pymodis_service
+ serviceType = Python
+
+ <DataInputs>
+
+  [tiles]
+   Title = the directory where the data that you want to download are stored on the FTP server.
+   Abstract = directory on the http/ftp [default=MOLT](source type: MOLA, MOLT or MOTA).
+   minOccurs = 1
+   maxOccurs = 1
+   <ComplexData>
+	<Default>
+	  mimeType = application/zip
+	</Default>
+   </Complexata>
+ </DataInputs>
+
+ <DataOutputs>
+  [Result]
+   Title = output modis_mosaic.py
+   Abstract = output modis_mosaic.py
+   <ComplexData>
+   <Default>
+    mimeType = image/tiff
+    useMapServer = true
+    asReference = true
+    msClassify = true
+   </Default>
+   <Supported>
+    mimeType = image/png
+    useMapServer = true
+   </Supported>
+   <Supported>
+    mimeType = text/xml
+    useMapServer = true
+   </Supported>
+   </ComplexData>
+ </DataOutputs>

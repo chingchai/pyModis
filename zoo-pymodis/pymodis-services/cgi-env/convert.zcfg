@@ -1,10 +1,10 @@
-[convertmodis]
+[convert]
  Title = convertmodis module
  Abstract = Convert MODIS HDF file using GDAL Python bindings. It can create GeoTiff file (or other GDAL supported formats) or HDF mosaic file for several tiles.
  processVersion = 2
  storeSupported = true
  statusSupported = true
- serviceProvider = convertmodis
+ serviceProvider = pymodis_service
  serviceType = Python
 <MetaData>
  title = Demo pyModis convertmodis.
