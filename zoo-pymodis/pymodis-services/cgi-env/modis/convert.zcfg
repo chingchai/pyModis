@@ -1,0 +1,66 @@
+[convert]
+ Title = modis_convert
+ Abstract = convert modis data from hdf to GDAL formats.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = pymodis_service
+ serviceType = Python
+
+ <DataInputs>
+
+  [tiles]
+   Title = the directory where the data that you want to convert.
+   Abstract = demo.
+   minOccurs = 1
+   maxOccurs = 1
+   <ComplexData>
+	<Default>
+	  mimeType = application/zip
+	</Default>
+   </Complexata>
+ [subset]
+  Title = the subset to consider.
+  Abstract = demo.
+  minOccurs = 0
+  maxOccurs = 1
+  <LiteralData>
+    dataType = string
+    <Default />
+  </LiteralData>
+ [res]
+ Title = output resolution.
+ Abstract = demo.
+ minOccurs = 0
+ maxOccurs = 1
+ <LiteralData>
+  DataType = int
+  <Default>
+   uom = meters
+   value = 1000
+  </Default>
+ </LiteralData>
+[epsg]
+ Title = the EPSG code for the preojection of output file.
+ Abstract = demo.
+ minOccurs = 0
+ maxOccurs = 1
+ <LiteralData>
+  DataType = int
+  <Default>
+   uom = meters
+   value = 32647
+  </Default>
+ </LiteralData>
+</DataInputs>
+
+ <DataOutputs>
+  [Result]
+   Title = output modis_convert.py
+   Abstract = output modis_convert.py
+   <ComplexData>
+   <Default>
+    mimeType = image/tiff
+   </Default>
+   </ComplexData>
+ </DataOutputs>
