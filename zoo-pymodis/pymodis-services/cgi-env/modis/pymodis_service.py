@@ -70,22 +70,24 @@ def convert(conf,inputs,outputs):
     z = zipfile.ZipFile(fh)
     for name in z.namelist():
         z.extract(name, storeDir)
-    fh.close()
-    
-    tiles = []
-    dire = os.path.dirname(storeDir)
-    with open(storeDir) as f:
-        for l in f:
-            name = os.path.splitext(l.strip())[0]
-            if '.hdf' not in name:
-                if dire not in l:
-                    fname = os.path.join(dire, l.strip())
-                else:
-                    fname = l.strip()
-                tiles.append(fname)
-    modisOgg = convertmodis_gdal.createMosaicGDAL(tiles, False,"GTiff")
-    storeResult=os.path.join(conf["main"]["tmpPath"],conf["lenv"]["usid"]+".tif")
-    modisOgg.run(storeResult)
+        #print >> sys.stderr,name
 
-    outputs["Result"]["generated_file"]=storeResult
+        if "listfile" in name:
+            listName=os.path.join(storeDir,name)
+    fh.close()
+    #print >> sys.stderr,listName
+
+    files = glob.glob(os.path.join(storeDir, 'MOD11A1.A2015*.hdf'))
+    #files = glob.glob(os.path.join(dest, 'MOD11A1.A2015*.hdf'))
+    #subset = [1,1,0,0,1,1]
+    subset = inputs["subset"]["value"]
+    res = inputs["res"]["value"]
+    epsg = inputs["epsg"]["value"]
+    output_pref = os.path.join(storeDir, 'MOD11A1.A2015*')
+
+
+    modisconv = convertmodis_gdal.convertModisGDAL(hdfname=files[0], prefix=output_pref, subset=subset, res=res, epsg=epsg)
+    modisconv.run()
+
+    outputs["Result"]["generated_file"]=os.path.join(conf["main"]["tmpPath"],conf["lenv"]["usid"]+"*_vrt.tif")
     return zoo.SERVICE_SUCCEEDED
