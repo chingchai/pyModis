@@ -523,19 +523,19 @@ Execute and accessing tiff as WCS GetMap Request: http://localhost/cgi-bin/mm/zo
 ```xml
 <wps:ExecuteResponse xsi:schemaLocation="http://www.opengis.net/wps/1.0.0 http://schemas.opengis.net/wps/1.0.0/wpsExecute_response.xsd" service="WPS" version="1.0.0" xml:lang="en-US" serviceInstance="http://localhost/cgi-bin/mm/zoo_loader.cgi">
     <wps:Process wps:processVersion="2">
-        <ows:Identifier>modis.download</ows:Identifier>
-        <ows:Title>modis_download</ows:Title>
-        <ows:Abstract>downloads MODIS data from NASA FTP servers. It can download large amounts of data and it can be profitably used with cron jobs to receive data with a fixed delay of time.</ows:Abstract>
+        <ows:Identifier>modis.mosaic</ows:Identifier>
+        <ows:Title>modis_mosaic</ows:Title>
+        <ows:Abstract>mosaic modis data from hdf to GDAL formats using GDAL.</ows:Abstract>
     </wps:Process>
-    <wps:Status creationTime="2016-07-02T05:13:17Z">
-        <wps:ProcessSucceeded>The service "download" ran successfully.</wps:ProcessSucceeded>
+    <wps:Status creationTime="2016-07-02T06:41:46Z">
+        <wps:ProcessSucceeded>The service "mosaic" ran successfully.</wps:ProcessSucceeded>
     </wps:Status>
     <wps:ProcessOutputs>
         <wps:Output>
             <ows:Identifier>Result</ows:Identifier>
-            <ows:Title>modis_download.py</ows:Title>
-            <ows:Abstract>modis_download.py output</ows:Abstract>
-            <wps:Reference href="http://myhost.net/tmp//6455ab26-403d-11e6-ae02-0800274bb48f.zip" mimeType="application/zip"/>
+            <ows:Title>output modis_mosaic.py</ows:Title>
+            <ows:Abstract>output modis_mosaic.py</ows:Abstract>
+            <wps:Reference href="http://myhost.net/tmp//f29108a2-4049-11e6-bb35-0800274bb48f.tif" mimeType="image/tiff"/>
         </wps:Output>
     </wps:ProcessOutputs>
 </wps:ExecuteResponse>
