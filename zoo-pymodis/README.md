@@ -91,6 +91,7 @@ modisMCD43B4.005.log
 ##Implementing the Python Service
 ### create WPS service from downmodis module
   - pymodis-services/cgi-env/modis/pymodis_service.py
+  https://github.com/chingchai/pyModis/blob/gsoc-2016/zoo-pymodis/pymodis-services/cgi-env/modis/pymodis_service.py
 ```python
 import zoo
 import sys
@@ -99,6 +100,8 @@ import os
 import zipfile
 
 from pymodis import downmodis
+from pymodis import convertmodis
+from pymodis import convertmodis_gdal
 
 def download(conf,inputs,outputs):
     # data download
@@ -128,6 +131,7 @@ def download(conf,inputs,outputs):
 ```
 
   - pymodis-services/cgi-env/modis/download.zcfg
+  https://github.com/chingchai/pyModis/blob/gsoc-2016/zoo-pymodis/pymodis-services/cgi-env/modis/download.zcfg
 ```
 [download]
  Title = modis_download
@@ -361,6 +365,7 @@ DescribeProcess: http://localhost/cgi-bin/mm/zoo_loader.cgi?request=DescribeProc
     </ProcessDescription>
 </wps:ProcessDescriptions>
 ```
+![screenshot](https://lh5.googleusercontent.com/B_G2cOp9eFj27T_FtE7p0GaHPrbcInfeDXFyaQ0iT6MMZI-DX-co8nym5rOBtzU6WcjezQ=w1841-h747 "Test downmodis module to download MODIS Data as a WPS service")
 
 ### Test the Execute request
 Execute: http://localhost/cgi-bin/mm/zoo_loader.cgi?request=Execute&service=WPS&version=1.0.0&Identifier=modis.download&DataInputs=tiles=h27v07,h28v07;today=2015-01-01;enddate=2015-01-05;product=MOD11A1.005;path=MOLT&ResponseDocument=Result@asReference=true
@@ -385,23 +390,181 @@ Execute: http://localhost/cgi-bin/mm/zoo_loader.cgi?request=Execute&service=WPS&
     </wps:ProcessOutputs>
 </wps:ExecuteResponse>
 ```
-![screenshot](https://lh5.googleusercontent.com/B_G2cOp9eFj27T_FtE7p0GaHPrbcInfeDXFyaQ0iT6MMZI-DX-co8nym5rOBtzU6WcjezQ=w1841-h747 "Test downmodis module to download MODIS Data as a WPS service")
-
 ![screenshot](https://lh5.googleusercontent.com/IcFMzAPiNSY246iN0YojLakBkRqVXsZSxz6_QKRmutBdUIv_G2gskvfEtLrFxvumxfNUfg=w1841-h747 "Result downmodis module")
 
-### create WPS service from convertmodis module
-Convert MODIS HDF file to GeoTiff file or create a HDF mosaic file for several tiles using Modis Reprojection Tools.
-- convertModis
-- createMosaic
-- processModis
+### create mosaic service from convertmodis_gdal module
+- pymodis-services/cgi-env/modis/pymodis_service.py#L37
+  https://github.com/chingchai/pyModis/blob/gsoc-2016/zoo-pymodis/pymodis-services/cgi-env/modis/pymodis_service.py
 
+```python
+def mosaic(conf,inputs,outputs):
+    storeDir = os.path.join(conf["main"]["tmpPath"],conf["lenv"]["usid"])
+    listName=None
+    fh = open(inputs["tiles"]["cache_file"], 'rb')
+    z = zipfile.ZipFile(fh)
+    for name in z.namelist():
+        z.extract(name, storeDir)
+        print >> sys.stderr,name
+        if "listfile" in name:
+            listName=os.path.join(storeDir,name)
+    fh.close()
+    print >> sys.stderr,listName
+    tiles = []
+    with open(listName) as f:
+        for l in f:
+            name = os.path.splitext(l.strip())[0]
+            if '.hdf' not in name:
+                if storeDir not in l:
+                    fname = os.path.join(storeDir, l.strip())
+                else:
+                    fname = l.strip()
+                tiles.append(fname)
+    print >> sys.stderr,tiles
+    modisOgg = convertmodis_gdal.createMosaicGDAL(tiles, False,"GTiff")
+    storeResult=os.path.join(conf["main"]["tmpPath"],conf["lenv"]["usid"]+".tif")
+    modisOgg.run(storeResult)
 
-### create WPS service from convertmodis_gdal module
-Convert MODIS HDF file using GDAL Python bindings. It can create GeoTiff file (or other GDAL supported formats) or HDF mosaic file for several tiles.
-- file_info
-- createMosaicGDAL
-- convertModisGDAL
+    outputs["Result"]["generated_file"]=storeResult
+    return zoo.SERVICE_SUCCEEDED
+```
 
+  - pymodis-services/cgi-env/modis/download.zcfg
+    https://github.com/chingchai/pyModis/blob/gsoc-2016/zoo-pymodis/pymodis-services/cgi-env/modis/mosaic.zcfg
+```
+[mosaic]
+ Title = modis_mosaic
+ Abstract = mosaic modis data from hdf to GDAL formats using GDAL.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = pymodis_service
+ serviceType = Python
+ <DataInputs>
+  [tiles]
+   Title = the directory where the data that you want to download are stored on the FTP server.
+   Abstract = directory on the http/ftp [default=MOLT](source type: MOLA, MOLT or MOTA).
+   minOccurs = 1
+   maxOccurs = 1
+   <ComplexData>
+	<Default>
+	  mimeType = application/zip
+	</Default>
+   </Complexata>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = output modis_mosaic.py
+   Abstract = output modis_mosaic.py
+   <ComplexData>
+   <Default>
+    mimeType = image/tiff
+   </Default>
+   <Supported>
+     mimeType = image/png
+    useMapServer = true
+   </Supported>
+   </ComplexData>
+ </DataOutputs>
+```
+### Test the DescribeProcess request
+DescribeProcess: http://localhost/cgi-bin/mm/zoo_loader.cgi?request=DescribeProcess&service=WPS&version=1.0.0&identifier=modis.mosaic
+
+```xml
+<wps:ProcessDescriptions xsi:schemaLocation="http://www.opengis.net/wps/1.0.0 http://schemas.opengis.net/wps/1.0.0/wpsDescribeProcess_response.xsd" service="WPS" version="1.0.0" xml:lang="en-US">
+    <ProcessDescription wps:processVersion="2" storeSupported="true" statusSupported="true">
+        <ows:Identifier>modis.mosaic</ows:Identifier>
+        <ows:Title>modis_mosaic</ows:Title>
+        <ows:Abstract>mosaic modis data from hdf to GDAL formats using GDAL.</ows:Abstract>
+        <DataInputs>
+            <Input minOccurs="1" maxOccurs="1">
+                <ows:Identifier>tiles</ows:Identifier>
+                <ows:Title>the directory where the data that you want to download are stored on the FTP server.</ows:Title>
+                <ows:Abstract>directory on the http/ftp [default=MOLT](source type: MOLA, MOLT or MOTA).</ows:Abstract>
+                <ComplexData>
+                    <Default>
+                        <Format>
+                            <MimeType>application/zip</MimeType>
+                        </Format>
+                    </Default>
+                    <Supported>
+                        <Format>
+                            <MimeType>application/zip</MimeType>
+                        </Format>
+                    </Supported>
+                </ComplexData>
+            </Input>
+        </DataInputs>
+        <ProcessOutputs>
+            <Output>
+                <ows:Identifier>Result</ows:Identifier>
+                <ows:Title>output modis_mosaic.py</ows:Title>
+                <ows:Abstract>output modis_mosaic.py</ows:Abstract>
+                <ComplexOutput>
+                    <Default>
+                        <Format>
+                            <MimeType>image/tiff</MimeType>
+                        </Format>
+                    </Default>
+                    <Supported>
+                        <Format>
+                            <MimeType>image/png</MimeType>
+                        </Format>
+                    </Supported>
+                </ComplexOutput>
+            </Output>
+        </ProcessOutputs>
+    </ProcessDescription>
+</wps:ProcessDescriptions>
+```
+![screenshot](https://lh4.googleusercontent.com/Pta9RVlK6oUNIzngdviOdtYVg1a43EChyJgvKeuVjZMufTERF4SFfKS_ZmGUqpXFagC8gw=w1841-h747 "DescribeProcess mosaic service")
+
+### Test the Execute request
+Execute and accessing tiff as WCS GetMap Request: http://localhost/cgi-bin/mm/zoo_loader.cgi?request=Execute&service=WPS&version=1.0.0&Identifier=modis.download&DataInputs=tiles=h27v07,h28v07;today=2015-01-01;enddate=2015-01-05;product=MOD11A1.005;path=MOLT&ResponseDocument=Result@asReference=true
+```xml
+<wps:ExecuteResponse xsi:schemaLocation="http://www.opengis.net/wps/1.0.0 http://schemas.opengis.net/wps/1.0.0/wpsExecute_response.xsd" service="WPS" version="1.0.0" xml:lang="en-US" serviceInstance="http://localhost/cgi-bin/mm/zoo_loader.cgi">
+    <wps:Process wps:processVersion="2">
+        <ows:Identifier>modis.download</ows:Identifier>
+        <ows:Title>modis_download</ows:Title>
+        <ows:Abstract>downloads MODIS data from NASA FTP servers. It can download large amounts of data and it can be profitably used with cron jobs to receive data with a fixed delay of time.</ows:Abstract>
+    </wps:Process>
+    <wps:Status creationTime="2016-07-02T05:13:17Z">
+        <wps:ProcessSucceeded>The service "download" ran successfully.</wps:ProcessSucceeded>
+    </wps:Status>
+    <wps:ProcessOutputs>
+        <wps:Output>
+            <ows:Identifier>Result</ows:Identifier>
+            <ows:Title>modis_download.py</ows:Title>
+            <ows:Abstract>modis_download.py output</ows:Abstract>
+            <wps:Reference href="http://myhost.net/tmp//6455ab26-403d-11e6-ae02-0800274bb48f.zip" mimeType="application/zip"/>
+        </wps:Output>
+    </wps:ProcessOutputs>
+</wps:ExecuteResponse>
+```
+![screenshot](https://lh5.googleusercontent.com/JMBb4D8C6MIZi9cB60TZV27d3gzaiTiC1vRaD_ncAyz9Zxox63lGKQqo_DGhLJdcpNSInQ=w1841-h745 "Result mosaic accessing a remote tiff as WCS GetMap Request")
+
+Execute and accessing tiff as WMS GetMap Request:
+http://localhost/cgi-bin/mm/zoo_loader.cgi?request=Execute&service=WPS&version=1.0.0&Identifier=modis.mosaic&DataInputs=tiles=reference@xlink:href=http://myhost.net/tmp/6455ab26-403d-11e6-ae02-0800274bb48f.zip&ResponseDocument=Result@asReference=true@mimeType=image/png
+```xml
+<wps:ExecuteResponse xsi:schemaLocation="http://www.opengis.net/wps/1.0.0 http://schemas.opengis.net/wps/1.0.0/wpsExecute_response.xsd" service="WPS" version="1.0.0" xml:lang="en-US" serviceInstance="http://localhost/cgi-bin/mm/zoo_loader.cgi">
+    <wps:Process wps:processVersion="2">
+        <ows:Identifier>modis.mosaic</ows:Identifier>
+        <ows:Title>modis_mosaic</ows:Title>
+        <ows:Abstract>mosaic modis data from hdf to GDAL formats using GDAL.</ows:Abstract>
+    </wps:Process>
+    <wps:Status creationTime="2016-07-02T05:44:33Z">
+        <wps:ProcessSucceeded>The service "mosaic" ran successfully.</wps:ProcessSucceeded>
+    </wps:Status>
+    <wps:ProcessOutputs>
+        <wps:Output>
+            <ows:Identifier>Result</ows:Identifier>
+            <ows:Title>output modis_mosaic.py</ows:Title>
+            <ows:Abstract>output modis_mosaic.py</ows:Abstract>
+            <wps:Reference href="http://myhost.net/cgi-bin/mm/mapserv.cgi?map=/var/data/Result_f4254a5a-4041-11e6-89ba-0800274bb48f.map&request=GetMap&service=WMS&version=1.3.0&layers=Result&width=640.000&height=320.000&format=image/png&bbox=10.000,91.384,20.000,117.064&crs=EPSG:4326" mimeType="image/tiff"/>
+        </wps:Output>
+    </wps:ProcessOutputs>
+</wps:ExecuteResponse>
+```
+![screenshot](https://lh4.googleusercontent.com/zXZ10hirrIOdcHHSid_d681atZeP-nuRg7dRnuqVyA88T47HlWRMOOPc-5wFQShOUwoutw=w1841-h747 "Result mosaic accessing a remote tiff as WMS GetMap Request")
 
 ## ZOO Wiki
   - [ZOO-Wiki](http://zoo-project.org/trac/wiki/Bringing_pyModis_to_the_web_through_ZOO-Project_GSoC_2016)
