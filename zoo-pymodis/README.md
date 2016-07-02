@@ -90,75 +90,68 @@ modisMCD43B4.005.log
 ```
 ##Implementing the Python Service
 ### create WPS service from downmodis module
-  - pymodis-services/cgi-env/modisdownload.py
+  - pymodis-services/cgi-env/modis/pymodis_service.py
 ```python
-  import zoo
-  import sys
-  import glob
-  from pymodis import downmodis
+import zoo
+import sys
+import glob
+import os
+import zipfile
 
-  def modisdownload(conf,inputs,outputs):
-      # data download
-      dns = inputs["dns"]["value"] #dest = "/home/chingchai/lab-pyModis/lst_terra/"
-      path = inputs["path"]["value"] # MOLA, MOLT or MOTA
-      tiles = inputs["tiles"]["value"] #"h27v07,h27v08,h28v07,h28v08" Thailand extent
-      today = inputs["today"]["value"] #"2015-01-01"
-      enddate = inputs["enddate"]["value"] #"2015-01-30"
-      product = inputs["product"]["value"] #"MCD43B4.005","MOD11A1.005"
-      #result = glob.glob(dns + '*.hdf')
-      down = downmodis.downModis(destinationFolder=dns, url='http://e4ftl01.cr.usgs.gov', path=path, tiles=tiles, today=today, enddate=enddate, product=product)
-      down.connect()
-      down.downloadsAllDay()
+from pymodis import downmodis
 
-      outputs["Result"]["value"]=\
-              "dns: "+inputs["dns"]["value"]+ " path: "+inputs["path"]["value"]+ " tiles: "+inputs["tiles"]["value"]+ " today: "+inputs["today"]["value"]+ " enddate: "+inputs["enddate"]["value"]+ " product: "+inputs["product"]["value"]+ str(glob.glob(dns + '*.hdf'))
-      return zoo.SERVICE_SUCCEEDED
+def download(conf,inputs,outputs):
+    # data download
+    # Create a temporary directory to store the downloaded files
+    storeDir = os.path.join(conf["main"]["tmpPath"],conf["lenv"]["usid"])
+    dns = storeDir #dest = "/home/chingchai/lab-pyModis/lst_terra/"
+    path = inputs["path"]["value"] # MOLA, MOLT or MOTA
+    tiles = inputs["tiles"]["value"]
+    #tiles = ",".join(inputs["tiles"]["value"]) #"h27v07,h27v08,h28v07,h28v08" Thailand extent
+    today = inputs["today"]["value"] #"2015-01-01"
+    enddate = inputs["enddate"]["value"] #"2015-01-30"
+    product = inputs["product"]["value"] #"MCD43B4.005","MOD11A1.005"
+
+    os.makedirs(dns)
+    down = downmodis.downModis(destinationFolder=dns, url='http://e4ftl01.cr.usgs.gov', path=path, tiles=tiles, today=today, enddate=enddate, product=product)
+    down.connect()
+    down.downloadsAllDay()
+
+    d=zipfile.ZipFile(os.path.join(conf["main"]["tmpPath"],conf["lenv"]["usid"]+".zip"), 'w')
+    for name in glob.glob(os.path.join(conf["main"]["tmpPath"],conf["lenv"]["usid"],"*")):
+        if name.count("zip")==0:
+            d.write(name.replace("\\","/"),os.path.basename(name), zipfile.ZIP_DEFLATED)
+            print >> sys.stderr,name.replace("\\","/")
+    d.close()
+    outputs["Result"]["generated_file"]=os.path.join(conf["main"]["tmpPath"],conf["lenv"]["usid"]+".zip")
+    return zoo.SERVICE_SUCCEEDED
 ```
 
-  - pymodis-services/cgi-env/modisdownload.zcfg
+  - pymodis-services/cgi-env/modis/download.zcfg
 ```
-[modisdownload]
+[download]
  Title = modis_download
  Abstract = downloads MODIS data from NASA FTP servers. It can download large amounts of data and it can be profitably used with cron jobs to receive data with a fixed delay of time.
  processVersion = 2
  storeSupported = true
  statusSupported = true
- serviceProvider = modisdownload
+ serviceProvider = pymodis_service
  serviceType = Python
-<MetaData>
- title = Demo pyModis imagery download.
-</MetaData>
-
  <DataInputs>
-   [dns]
-   Title = destinationFolder
-   Abstract = where the files will be stored
-   minOccurs = 1
-   maxOccurs = 1
-   <MetaData>
-    title = demo
-   </MetaData>
-   <LiteralData>
-    dataType = string
-    <Default>
-    uom = meters
-    </Default>
-    <Supported>
-    uom = feet
-    </Supported>
-   </LiteralData>
   [path]
    Title = the directory where the data that you want to download are stored on the FTP server.
    Abstract = directory on the http/ftp [default=MOLT](source type: MOLA, MOLT or MOTA).
-   minOccurs = 1
+   minOccurs = 0
    maxOccurs = 1
    <MetaData>
     title = demo
    </MetaData>
    <LiteralData>
     dataType = string
+    AllowedValues = MOLA,MOLT,MOTA
     <Default>
     uom = meters
+    value = MOLT
     </Default>
     <Supported>
     uom = feet
@@ -239,40 +232,8 @@ modisMCD43B4.005.log
    Abstract = modis_download.py output
    <ComplexData>
    <Default>
-   mimeType = text/html
-   encoding = UTF-8
-   schema =
+   mimeType = application/zip
    </Default>
-   <Supported>
-   mimeType = text/csv
-   encoding = UTF-8
-   schema = http://schemas.opengis.net/gml/3.1.0/base/feature.xsd
-   useMapserver = false
-   </Supported>
-   <Supported>
-   mimeType = image/png
-   useMapserver = true
-   asReference = true
-   msStyle = STYLE COLOR 125 0 105 OUTLINECOLOR 0 0 0 WIDTH 3 END
-   </Supported>
-   <Supported>
-   mimeType = image/jpg
-   useMapserver = true
-   asReference = true
-   msStyle = STYLE COLOR 125 0 105 OUTLINECOLOR 0 0 0 WIDTH 3 END
-   </Supported>
-   <Supported>
-   mimeType = image/tif
-   useMapserver = false
-   asReference = false
-   msClassify = ....
-   </Supported>
-   <Supported>
-   mimeType = image/hdf
-   useMapserver = false
-   asReference = false
-   msClassify = ....
-   </Supported>
    </ComplexData>
  </DataOutputs>
 ```
