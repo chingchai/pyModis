@@ -566,6 +566,231 @@ http://localhost/cgi-bin/mm/zoo_loader.cgi?request=Execute&service=WPS&version=1
 ```
 ![screenshot](https://lh4.googleusercontent.com/zXZ10hirrIOdcHHSid_d681atZeP-nuRg7dRnuqVyA88T47HlWRMOOPc-5wFQShOUwoutw=w1841-h747 "Result mosaic accessing a remote tiff as WMS GetMap Request")
 
+### create convert service from convertmodis_gdal module
+- pymodis-services/cgi-env/modis/pymodis_service.py#L67
+  https://github.com/chingchai/pyModis/blob/gsoc-2016/zoo-pymodis/pymodis-services/cgi-env/modis/pymodis_service.py
+
+```python
+def convert(conf,inputs,outputs):
+    storeDir = os.path.join(conf["main"]["tmpPath"],conf["lenv"]["usid"])
+    fh = open(inputs["tiles"]["cache_file"], 'rb')
+    z = zipfile.ZipFile(fh)
+    for name in z.namelist():
+        z.extract(name, storeDir)
+        print >> sys.stderr,name
+
+        if "listfile" in name:
+            listName=os.path.join(storeDir,name)
+    fh.close()
+    files = glob.glob(os.path.join(storeDir, '*.hdf'))
+    print >> sys.stderr, files
+    res = float(inputs["res"]["value"])
+    epsg = inputs["epsg"]["value"]
+    output_pref = os.path.join(storeDir, 'MOD11A1')
+    modisconv = convertmodis_gdal.convertModisGDAL(hdfname=files[0], prefix=output_pref, subset=[1,1,1,1], res=res, epsg=epsg)
+    modisconv.run()
+    d=zipfile.ZipFile(os.path.join(conf["main"]["tmpPath"],conf["lenv"]["usid"]+".zip"), 'w')
+    for name in glob.glob(os.path.join(conf["main"]["tmpPath"],conf["lenv"]["usid"],"*")):
+        if name.count("zip")==0:
+            d.write(name.replace("\\","/"),os.path.basename(name), zipfile.ZIP_DEFLATED)
+            print >> sys.stderr,name.replace("\\","/")
+    d.close()
+    outputs["Result"]["generated_file"]=os.path.join(conf["main"]["tmpPath"],conf["lenv"]["usid"]+".zip")
+    return zoo.SERVICE_SUCCEEDED
+```
+
+  - pymodis-services/cgi-env/modis/convert.zcfg
+    https://github.com/chingchai/pyModis/blob/gsoc-2016/zoo-pymodis/pymodis-services/cgi-env/modis/convert.zcfg
+```
+[convert]
+ Title = modis_convert
+ Abstract = convert modis data from hdf to GDAL formats.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = pymodis_service
+ serviceType = Python
+ <DataInputs>
+  [tiles]
+   Title = the directory where the data that you want to convert.
+   Abstract = demo.
+   minOccurs = 1
+   maxOccurs = 1
+   <ComplexData>
+	<Default>
+	  mimeType = application/zip
+	</Default>
+   </Complexata>
+ [subset]
+  Title = the subset to consider.
+  Abstract = demo.
+  minOccurs = 0
+  maxOccurs = 1
+  <LiteralData>
+    dataType = string
+    <Default />
+  </LiteralData>
+ [res]
+ Title = output resolution.
+ Abstract = demo.
+ minOccurs = 0
+ maxOccurs = 1
+ <LiteralData>
+  DataType = int
+  <Default>
+   uom = meters
+   value = 1000
+  </Default>
+ </LiteralData>
+[epsg]
+ Title = the EPSG code for the preojection of output file.
+ Abstract = demo.
+ minOccurs = 0
+ maxOccurs = 1
+ <LiteralData>
+  DataType = int
+  <Default>
+   uom = meters
+   value = 32647
+  </Default>
+ </LiteralData>
+</DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = output modis_convert.py
+   Abstract = output modis_convert.py
+   <ComplexData>
+   <Default>
+    mimeType = application/zip
+   </Default>
+   </ComplexData>
+ </DataOutputs>
+
+```
+### Test the DescribeProcess request
+DescribeProcess: http://localhost/cgi-bin/mm/zoo_loader.cgi?request=DescribeProcess&service=WPS&version=1.0.0&identifier=modis.convert
+
+```xml
+<wps:ProcessDescriptions xsi:schemaLocation="http://www.opengis.net/wps/1.0.0 http://schemas.opengis.net/wps/1.0.0/wpsDescribeProcess_response.xsd" service="WPS" version="1.0.0" xml:lang="en-US">
+    <ProcessDescription wps:processVersion="2" storeSupported="true" statusSupported="true">
+        <ows:Identifier>modis.convert</ows:Identifier>
+        <ows:Title>modis_convert</ows:Title>
+        <ows:Abstract>convert modis data from hdf to GDAL formats.</ows:Abstract>
+        <DataInputs>
+            <Input minOccurs="1" maxOccurs="1">
+                <ows:Identifier>tiles</ows:Identifier>
+                <ows:Title>the directory where the data that you want to convert.</ows:Title>
+                <ows:Abstract>demo.</ows:Abstract>
+                <ComplexData>
+                    <Default>
+                        <Format>
+                            <MimeType>application/zip</MimeType>
+                        </Format>
+                    </Default>
+                    <Supported>
+                        <Format>
+                            <MimeType>application/zip</MimeType>
+                        </Format>
+                    </Supported>
+                </ComplexData>
+            </Input>
+            <Input minOccurs="0" maxOccurs="1">
+                <ows:Identifier>subset</ows:Identifier>
+                <ows:Title>the subset to consider.</ows:Title>
+                <ows:Abstract>demo.</ows:Abstract>
+                <LiteralData>
+                    <ows:DataType ows:reference="http://www.w3.org/TR/xmlschema-2/#string">string</ows:DataType>
+                    <ows:AnyValue/>
+                </LiteralData>
+            </Input>
+            <Input minOccurs="0" maxOccurs="1">
+                <ows:Identifier>res</ows:Identifier>
+                <ows:Title>output resolution.</ows:Title>
+                <ows:Abstract>demo.</ows:Abstract>
+                <LiteralData>
+                    <ows:DataType ows:reference="http://www.w3.org/TR/xmlschema-2/#int">int</ows:DataType>
+                    <UOMs>
+                        <Default>
+                            <ows:UOM>meters</ows:UOM>
+                        </Default>
+                    </UOMs>
+                    <ows:AnyValue/>
+                    <DefaultValue>1000</DefaultValue>
+                </LiteralData>
+            </Input>
+            <Input minOccurs="0" maxOccurs="1">
+                <ows:Identifier>epsg</ows:Identifier>
+                <ows:Title>the EPSG code for the preojection of output file.</ows:Title>
+                <ows:Abstract>demo.</ows:Abstract>
+                <LiteralData>
+                    <ows:DataType ows:reference="http://www.w3.org/TR/xmlschema-2/#int">int</ows:DataType>
+                    <UOMs>
+                        <Default>
+                            <ows:UOM>meters</ows:UOM>
+                        </Default>
+                    </UOMs>
+                    <ows:AnyValue/>
+                    <DefaultValue>32647</DefaultValue>
+                </LiteralData>
+            </Input>
+        </DataInputs>
+        <ProcessOutputs>
+            <Output>
+                <ows:Identifier>Result</ows:Identifier>
+                <ows:Title>output modis_convert.py</ows:Title>
+                <ows:Abstract>output modis_convert.py</ows:Abstract>
+                <ComplexOutput>
+                    <Default>
+                        <Format>
+                            <MimeType>application/zip</MimeType>
+                        </Format>
+                    </Default>
+                    <Supported>
+                        <Format>
+                            <MimeType>application/zip</MimeType>
+                        </Format>
+                    </Supported>
+                </ComplexOutput>
+            </Output>
+        </ProcessOutputs>
+    </ProcessDescription>
+</wps:ProcessDescriptions>
+```
+![screenshot](https://lh5.googleusercontent.com/qdwYn4TOF9Xhwsha5c5P6d2KQYDXGAbOJvpEqv9pew3w3ShhjuYV0iARIMCO4OpPrcMiAg=w1841-h745 "DescribeProcess convert service")
+
+### Test the Execute request
+Execute Request on terminal: sudo ./zoo_loader.cgi "request=Execute&service=WPS&version=1.0.0&Identifier=modis.convert&DataInputs=tiles=reference@xlink:href=http://myhost.net/tmp/6455ab26-403d-11e6-ae02-0800274bb48f.zip;res=1000;epsg=32647&ResponseDocument=Result@asReference=true"
+
+```xml
+X-Powered-By: ZOO-Project@MapMint
+Content-Type: text/xml; charset=UTF-8
+Status: 200 OK
+<?xml version="1.0" encoding="UTF-8"?>
+<wps:ExecuteResponse
+    xmlns:ows="http://www.opengis.net/ows/1.1"
+    xmlns:wps="http://www.opengis.net/wps/1.0.0"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wps/1.0.0 http://schemas.opengis.net/wps/1.0.0/wpsExecute_response.xsd" service="WPS" version="1.0.0" xml:lang="en-US" serviceInstance="http://myhost.net/cgi-bin/mm/zoo_loader.cgi">
+    <wps:Process wps:processVersion="2">
+        <ows:Identifier>modis.convert</ows:Identifier>
+        <ows:Title>modis_convert</ows:Title>
+        <ows:Abstract>convert modis data from hdf to GDAL formats.</ows:Abstract>
+    </wps:Process>
+    <wps:Status creationTime="2016-07-02T06:08:09Z">
+        <wps:ProcessSucceeded>The service "convert" ran successfully.</wps:ProcessSucceeded>
+    </wps:Status>
+    <wps:ProcessOutputs>
+        <wps:Output>
+            <ows:Identifier>Result</ows:Identifier>
+            <ows:Title>output modis_convert.py</ows:Title>
+            <ows:Abstract>output modis_convert.py</ows:Abstract>
+            <wps:Reference href="http://myhost.net/tmp//41cf8eb6-4045-11e6-a4c9-0800274bb48f.zip" mimeType="application/zip"/>
+        </wps:Output>
+    </wps:ProcessOutputs>
+</wps:ExecuteResponse>
+```
+![screenshot](https://lh5.googleusercontent.com/9SMqfEBzCFJszRXByGWXsWUEwAw9F1DTmlGRmCqoCDLxdT0ruel4JbBUtKkDIYrVMD_-YQ=w1841-h745 "Result convert modis")
+
 ## ZOO Wiki
   - [ZOO-Wiki](http://zoo-project.org/trac/wiki/Bringing_pyModis_to_the_web_through_ZOO-Project_GSoC_2016)
   - [OSGeo-Wiki](https://wiki.osgeo.org/wiki/Bringing_pyModis_to_the_web_through_ZOO-Project_GSoC_2016)
