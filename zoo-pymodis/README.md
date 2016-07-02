@@ -385,9 +385,9 @@ Execute: http://localhost/cgi-bin/mm/zoo_loader.cgi?request=Execute&service=WPS&
     </wps:ProcessOutputs>
 </wps:ExecuteResponse>
 ```
-![screenshot](https://drive.google.com/open?id=0B6Fk2noS6wzNbVNuS3ZKc1lkcFk "Test downmodis module to download MODIS Data as a WPS service")
+![screenshot](https://lh5.googleusercontent.com/B_G2cOp9eFj27T_FtE7p0GaHPrbcInfeDXFyaQ0iT6MMZI-DX-co8nym5rOBtzU6WcjezQ=w1841-h747 "Test downmodis module to download MODIS Data as a WPS service")
 
-![screenshot](https://drive.google.com/open?id=0B6Fk2noS6wzNMDJTcE9ia3hhYTQ "Result downmodis module")
+![screenshot](https://lh5.googleusercontent.com/IcFMzAPiNSY246iN0YojLakBkRqVXsZSxz6_QKRmutBdUIv_G2gskvfEtLrFxvumxfNUfg=w1841-h747 "Result downmodis module")
 
 ### create WPS service from convertmodis module
 Convert MODIS HDF file to GeoTiff file or create a HDF mosaic file for several tiles using Modis Reprojection Tools.
