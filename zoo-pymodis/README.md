@@ -239,41 +239,27 @@ def download(conf,inputs,outputs):
 ```
 
 ### Test the DescribeProcess request
-DescribeProcess: http://localhost/cgi-bin/mm/zoo_loader.cgi?request=DescribeProcess&service=WPS&version=1.0.0&identifier=modisdownload
+DescribeProcess: http://localhost/cgi-bin/mm/zoo_loader.cgi?request=DescribeProcess&service=WPS&version=1.0.0&identifier=modis.download
 
 ```xml
 <wps:ProcessDescriptions xsi:schemaLocation="http://www.opengis.net/wps/1.0.0 http://schemas.opengis.net/wps/1.0.0/wpsDescribeProcess_response.xsd" service="WPS" version="1.0.0" xml:lang="en-US">
     <ProcessDescription wps:processVersion="2" storeSupported="true" statusSupported="true">
-        <ows:Identifier>modisdownload</ows:Identifier>
+        <ows:Identifier>modis.download</ows:Identifier>
         <ows:Title>modis_download</ows:Title>
         <ows:Abstract>downloads MODIS data from NASA FTP servers. It can download large amounts of data and it can be profitably used with cron jobs to receive data with a fixed delay of time.</ows:Abstract>
-        <ows:Metadata xlink:title="Demo pyModis imagery download."/>
         <DataInputs>
-            <Input minOccurs="1" maxOccurs="1">
-                <ows:Identifier>dns</ows:Identifier>
-                <ows:Title>destinationFolder</ows:Title>
-                <ows:Abstract>where the files will be stored</ows:Abstract>
-                <ows:Metadata xlink:title="demo"/>
-                <LiteralData>
-                    <ows:DataType ows:reference="http://www.w3.org/TR/xmlschema-2/#string">string</ows:DataType>
-                    <UOMs>
-                        <Default>
-                            <ows:UOM>meters</ows:UOM>
-                        </Default>
-                        <Supported>
-                            <ows:UOM>feet</ows:UOM>
-                        </Supported>
-                    </UOMs>
-                    <ows:AnyValue/>
-                </LiteralData>
-            </Input>
-            <Input minOccurs="1" maxOccurs="1">
+            <Input minOccurs="0" maxOccurs="1">
                 <ows:Identifier>path</ows:Identifier>
                 <ows:Title>the directory where the data that you want to download are stored on the FTP server.</ows:Title>
                 <ows:Abstract>directory on the http/ftp [default=MOLT](source type: MOLA, MOLT or MOTA).</ows:Abstract>
                 <ows:Metadata xlink:title="demo"/>
                 <LiteralData>
                     <ows:DataType ows:reference="http://www.w3.org/TR/xmlschema-2/#string">string</ows:DataType>
+                    <ows:AllowedValues>
+                        <ows:Value>MOLA</ows:Value>
+                        <ows:Value>MOLT</ows:Value>
+                        <ows:Value>MOTA</ows:Value>
+                    </ows:AllowedValues>
                     <UOMs>
                         <Default>
                             <ows:UOM>meters</ows:UOM>
@@ -282,7 +268,7 @@ DescribeProcess: http://localhost/cgi-bin/mm/zoo_loader.cgi?request=DescribeProc
                             <ows:UOM>feet</ows:UOM>
                         </Supported>
                     </UOMs>
-                    <ows:AnyValue/>
+                    <DefaultValue>MOLT</DefaultValue>
                 </LiteralData>
             </Input>
             <Input minOccurs="1" maxOccurs="1">
@@ -366,29 +352,9 @@ DescribeProcess: http://localhost/cgi-bin/mm/zoo_loader.cgi?request=DescribeProc
                 <ComplexOutput>
                     <Default>
                         <Format>
-                            <MimeType>text/html</MimeType>
-                            <Encoding>UTF-8</Encoding>
+                            <MimeType>application/zip</MimeType>
                         </Format>
                     </Default>
-                    <Supported>
-                        <Format>
-                            <MimeType>text/csv</MimeType>
-                            <Encoding>UTF-8</Encoding>
-                            <Schema>http://schemas.opengis.net/gml/3.1.0/base/feature.xsd</Schema>
-                        </Format>
-                        <Format>
-                            <MimeType>image/png</MimeType>
-                        </Format>
-                        <Format>
-                            <MimeType>image/jpg</MimeType>
-                        </Format>
-                        <Format>
-                            <MimeType>image/tif</MimeType>
-                        </Format>
-                        <Format>
-                            <MimeType>image/hdf</MimeType>
-                        </Format>
-                    </Supported>
                 </ComplexOutput>
             </Output>
         </ProcessOutputs>
@@ -397,33 +363,31 @@ DescribeProcess: http://localhost/cgi-bin/mm/zoo_loader.cgi?request=DescribeProc
 ```
 
 ### Test the Execute request
-Execute: http://localhost/cgi-bin/mm/zoo_loader.cgi?request=Execute&service=WPS&version=1.0.0&Identifier=modisdownload&DataInputs=dns=/home/eileen/Downloads/test/;path=MOTA;tiles=h27v07;today=2015-01-01;enddate=2015-01-30;product=MCD43B4.005
+Execute: http://localhost/cgi-bin/mm/zoo_loader.cgi?request=Execute&service=WPS&version=1.0.0&Identifier=modis.download&DataInputs=tiles=h27v07,h28v07;today=2015-01-01;enddate=2015-01-05;product=MOD11A1.005;path=MOLT&ResponseDocument=Result@asReference=true
 
 ```xml
 <wps:ExecuteResponse xsi:schemaLocation="http://www.opengis.net/wps/1.0.0 http://schemas.opengis.net/wps/1.0.0/wpsExecute_response.xsd" service="WPS" version="1.0.0" xml:lang="en-US" serviceInstance="http://localhost/cgi-bin/mm/zoo_loader.cgi">
     <wps:Process wps:processVersion="2">
-        <ows:Identifier>modisdownload</ows:Identifier>
+        <ows:Identifier>modis.download</ows:Identifier>
         <ows:Title>modis_download</ows:Title>
         <ows:Abstract>downloads MODIS data from NASA FTP servers. It can download large amounts of data and it can be profitably used with cron jobs to receive data with a fixed delay of time.</ows:Abstract>
     </wps:Process>
-    <wps:Status creationTime="2016-06-17T09:58:35Z">
-        <wps:ProcessSucceeded>The service "modisdownload" ran successfully.</wps:ProcessSucceeded>
+    <wps:Status creationTime="2016-07-02T05:13:17Z">
+        <wps:ProcessSucceeded>The service "download" ran successfully.</wps:ProcessSucceeded>
     </wps:Status>
     <wps:ProcessOutputs>
         <wps:Output>
             <ows:Identifier>Result</ows:Identifier>
             <ows:Title>modis_download.py</ows:Title>
             <ows:Abstract>modis_download.py output</ows:Abstract>
-            <wps:Data>
-                <wps:ComplexData mimeType="text/html" encoding="UTF-8">dns: /home/eileen/Downloads/test/ path: MOTA tiles: h27v07 today: 2015-01-01 enddate: 2015-01-30 product: MCD43B4.005['/home/eileen/Downloads/test/MCD43B4.A2015009.h27v07.005.2015028132054.hdf', '/home/eileen/Downloads/test/MCD43B4.A2015001.h27v07.005.2015027221605.hdf', '/home/eileen/Downloads/test/MCD43B4.A2015017.h27v07.005.2015034104800.hdf', '/home/eileen/Downloads/test/MCD43B4.A2015025.h27v07.005.2015044141504.hdf']</wps:ComplexData>
-            </wps:Data>
+            <wps:Reference href="http://myhost.net/tmp//6455ab26-403d-11e6-ae02-0800274bb48f.zip" mimeType="application/zip"/>
         </wps:Output>
     </wps:ProcessOutputs>
 </wps:ExecuteResponse>
 ```
-![screenshot](https://wiki.osgeo.org/images/a/ab/Modis-testonweb.png "Test downmodis module to download MODIS Data as a WPS service")
+![screenshot](https://drive.google.com/open?id=0B6Fk2noS6wzNbVNuS3ZKc1lkcFk "Test downmodis module to download MODIS Data as a WPS service")
 
-![screenshot](https://wiki.osgeo.org/images/b/bd/Modisdown-resul.png "Result downmodis module")
+![screenshot](https://drive.google.com/open?id=0B6Fk2noS6wzNMDJTcE9ia3hhYTQ "Result downmodis module")
 
 ### create WPS service from convertmodis module
 Convert MODIS HDF file to GeoTiff file or create a HDF mosaic file for several tiles using Modis Reprojection Tools.
