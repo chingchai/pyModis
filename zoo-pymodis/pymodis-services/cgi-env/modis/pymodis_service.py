@@ -70,24 +70,27 @@ def convert(conf,inputs,outputs):
     z = zipfile.ZipFile(fh)
     for name in z.namelist():
         z.extract(name, storeDir)
-        #print >> sys.stderr,name
+        print >> sys.stderr,name
 
         if "listfile" in name:
             listName=os.path.join(storeDir,name)
     fh.close()
     #print >> sys.stderr,listName
 
-    files = glob.glob(os.path.join(storeDir, 'MOD11A1.A2015*.hdf'))
-    #files = glob.glob(os.path.join(dest, 'MOD11A1.A2015*.hdf'))
-    #subset = [1,1,0,0,1,1]
-    subset = inputs["subset"]["value"]
-    res = inputs["res"]["value"]
+    files = glob.glob(os.path.join(storeDir, '*.hdf'))
+    print >> sys.stderr, files
+
+    res = float(inputs["res"]["value"])
     epsg = inputs["epsg"]["value"]
-    output_pref = os.path.join(storeDir, 'MOD11A1.A2015*')
+    output_pref = os.path.join(storeDir, 'MOD11A1')
 
-
-    modisconv = convertmodis_gdal.convertModisGDAL(hdfname=files[0], prefix=output_pref, subset=subset, res=res, epsg=epsg)
+    modisconv = convertmodis_gdal.convertModisGDAL(hdfname=files[0], prefix=output_pref, subset=[1,1,1,1], res=res, epsg=epsg)
     modisconv.run()
-
-    outputs["Result"]["generated_file"]=os.path.join(conf["main"]["tmpPath"],conf["lenv"]["usid"]+"*_vrt.tif")
+    d=zipfile.ZipFile(os.path.join(conf["main"]["tmpPath"],conf["lenv"]["usid"]+".zip"), 'w')
+    for name in glob.glob(os.path.join(conf["main"]["tmpPath"],conf["lenv"]["usid"],"*")):
+        if name.count("zip")==0:
+            d.write(name.replace("\\","/"),os.path.basename(name), zipfile.ZIP_DEFLATED)
+            print >> sys.stderr,name.replace("\\","/")
+    d.close()
+    outputs["Result"]["generated_file"]=os.path.join(conf["main"]["tmpPath"],conf["lenv"]["usid"]+".zip")
     return zoo.SERVICE_SUCCEEDED
