@@ -9,7 +9,6 @@ from pymodis import convertmodis
 from pymodis import convertmodis_gdal
 
 def download(conf,inputs,outputs):
-    # data download
     # Create a temporary directory to store the downloaded files
     storeDir = os.path.join(conf["main"]["tmpPath"],conf["lenv"]["usid"])
     dns = storeDir #dest = "/home/chingchai/lab-pyModis/lst_terra/"
@@ -65,29 +64,26 @@ def mosaic(conf,inputs,outputs):
     return zoo.SERVICE_SUCCEEDED
 
 def convert(conf,inputs,outputs):
+    import zipfile
+    import glob,os
+
     storeDir = os.path.join(conf["main"]["tmpPath"],conf["lenv"]["usid"])
     fh = open(inputs["tiles"]["cache_file"], 'rb')
     z = zipfile.ZipFile(fh)
     for name in z.namelist():
         z.extract(name, storeDir)
-        print >> sys.stderr,name
-
-        if "listfile" in name:
-            listName=os.path.join(storeDir,name)
     fh.close()
-    #print >> sys.stderr,listName
-
     files = glob.glob(os.path.join(storeDir, '*.hdf'))
-    print >> sys.stderr, files
-
+    #print >> sys.stderr, files
+    #subset = ",".join(inputs["tiles"]["value"])
     res = float(inputs["res"]["value"])
     epsg = inputs["epsg"]["value"]
-    output_pref = os.path.join(storeDir, 'MOD11A1')
+    output_pref = os.path.join(storeDir, 'Result_convert')
 
-    modisconv = convertmodis_gdal.convertModisGDAL(hdfname=files[0], prefix=output_pref, subset=[1,1,1,1], res=res, epsg=epsg)
+    modisconv = convertmodis_gdal.convertModisGDAL(hdfname=files[0], prefix=output_pref, subset=[1,1,1,1,1,1,1,1,1,1,1,1], res=res, epsg=epsg)
     modisconv.run()
     d=zipfile.ZipFile(os.path.join(conf["main"]["tmpPath"],conf["lenv"]["usid"]+".zip"), 'w')
-    for name in glob.glob(os.path.join(conf["main"]["tmpPath"],conf["lenv"]["usid"],"*")):
+    for name in glob.glob(os.path.join(conf["main"]["tmpPath"],conf["lenv"]["usid"],"*.tif")):
         if name.count("zip")==0:
             d.write(name.replace("\\","/"),os.path.basename(name), zipfile.ZIP_DEFLATED)
             print >> sys.stderr,name.replace("\\","/")
