@@ -1,0 +1,265 @@
+body { overflow: hidden; }
+
+@font-face {
+	font-family: 'ZOO-Font';
+	src:url('../fonts/ZOO-Font.eot');
+	src:url('../fonts/ZOO-Font.eot') format('embedded-opentype'),
+		url('../fonts/ZOO-Font.woff') format('woff'),
+		url('../fonts/ZOO-Font.ttf') format('truetype'),
+		url('../fonts/ZOO-Font.svg') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {font-family: 'GeoLabsLogo';src:url('../fonts/GeoLabsLogo.ttf') format('truetype');font-weight: normal;font-style: normal;}
+
+[class^="icon-"], [class*=" icon-"] {
+	font-family: 'ZOO-Font';
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+a{color:#f0980c;}
+a:hover{color:#663d05;}
+
+.icon-pm:before {
+content: "\e603";
+font-size:2em;
+padding:10px 0 0 0;
+}
+.sml {
+font-size:.6em !important;
+padding: 0 !important;
+}
+
+
+[class^="icon-f-"], [class*=" icon-f-"] {
+font-family: 'GeoLabsLogo';
+speak: none;
+font-style: normal;
+font-weight: normal;
+font-variant: normal;
+text-transform: none;
+line-height: 1;
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
+}
+.icon-f-geolabs:before {
+content: "\e666";
+color:#707070;
+}
+.sun {
+  display: none;
+  padding: -5px 0 0 0;
+}
+.navbar-brand {
+padding:10px 15px 5px 10px;
+display: table-cell;
+font-family: 'Days One', sans-serif;
+  font-size: 2em !important;
+  color: #FFFFFF !important;
+  height: 50px;
+vertical-align:middle;}
+
+.navbar-default .navbar-collapse, .navbar-default .navbar-form {
+  border-color: #663e05;
+}
+
+.navbar-default{border-color:#663e05 !important;}
+.navbar-default{background:#663e05;}
+
+.navbar-brand i {color:#f0980c;}
+.navbar-btn {
+margin:7px 5px 0 0;
+}
+
+.navbar-right > li > a {
+  color: #fef7cb !important;
+}
+
+.navbar-default .navbar-nav>.open>a, .navbar-default .navbar-nav>.open>a:hover, .navbar-default .navbar-nav>.open>a:focus {
+  color: #FFF;
+  background-color: #f7b30b;
+}
+
+.dropdown-menu{background-color:#fefcea;border-color:#ffcd0b;font-weight:normal !important;}
+.dropdown-menu li, .dropdown-menu li > a {color:#a19a86 !important;}
+.dropdown-menu li > a:hover, .dropdown-menu li > a:focus, .dropdown-submenu:hover > a{color:#FFF !important;background:#c0b8a0;}
+
+.window.active .window-header .window-title, .modal-title{color:#663e05}
+
+#wprof{
+    margin-top:-15%;
+    z-index:1050 !important;
+}
+.btn-sml {
+padding:7px 10px !important;
+}
+.btn-default {
+  color: #FFF;
+  background-color: #e6e6e6;
+  border-color: #ccc;
+}
+.btn-default:hover,
+.btn-default:focus,
+.btn-default:active,
+.btn-default.active,
+.open > .dropdown-toggle.btn-default {
+  color: #FFFFFF !important;
+  background-color: orange !important;
+  border-color: #f0980c;
+}
+
+.navbar-offset { margin-top: 50px; }
+.pm-demo-title {
+color:#fef7cb;
+padding:0 0 0 0;
+margin:0 20px 0 0;
+font-size:1.3em;
+float:left;
+line-height:50px;
+}
+.panel-group .panel {
+  border-radius: 0 !important;
+}
+.panel-title {
+margin-top: 0;
+margin-bottom: 0;
+font-size: 14px;
+color:#707070;
+font-weight:normal;
+}
+.panel-title a:hover {
+text-decoration:none !important;
+color:#663e05;
+}
+.panel-body{background-color:#fefcea;color:#9c8a71}
+#map { position: absolute; top: 50px; bottom: 0px; left: 0px; right: 0px; z-index:35;}
+#map .ol-zoom { font-size: 1.2em; }
+.zoom-top-opened-sidebar { margin-top: 5px;}
+.zoom-top-collapsed { margin-top: 45px; }
+
+.ol-attribution ul, .ol-attribution button {
+  display: inline;
+  float: right;
+  font-size:.9rem;
+}
+.ol-control button {
+  display: block;
+  margin: 1px;
+  padding: 0;
+  color: white;
+  font-size: 1.14em;
+  font-weight: bold;
+  text-decoration: none;
+  text-align: center;
+  height: 1.375em;
+  width: 1.375em;
+  line-height: .4em;
+  background-color: #663e05;
+  background-color: rgba(102,62,5,0.9);
+  border: none;
+  border-radius: 2px;
+}
+
+.ol-control button:hover, .ol-control button:focus{
+background:orange;
+color:#FFF;
+}
+.mini-submenu{
+display:none;  
+background-color: rgba(255, 255, 255, 0.7);
+border: 1px solid #663e05 !important;
+color:#663e05;
+border-radius: 4px;
+padding: 9px;  
+width: 42px;
+text-align: center;
+}
+.mini-submenu:hover{ 
+background-color: rgba(254, 252, 234, 1);
+border: 1px solid orange !important;
+color:orange;
+}
+.mini-submenu-left {
+position: absolute;
+top: 60px;
+left: .5em;
+ z-index: 40;
+}
+
+.bl{height:24px;width:24px;border:1px solid #CCCCCC;border-radius:3px;display:inline-block;}
+.osm{background:url(../img/osm.png);vertical-align:middle;}
+
+.sidebar { z-index: 45;margin:0 !important;padding:0 !important;position:relative !important;}
+.mini-submenu:hover{cursor: pointer;}
+
+.slide-submenu{
+background: #E0E0E0;
+border:1px solid #CCCCCC;
+color:#FFFFFF;
+display: inline-block;
+padding:4px 7px;
+border-radius: 4px;
+cursor: pointer;
+font-size:.65em;
+}
+.slide-submenu:hover{
+color:#FFFFFF !important;
+border:1px solid orange;
+background:orange !important;
+}
+.list-group-item{
+padding:8px;
+}
+.list-group-item:hover{
+color:#00a099 !important;
+}
+
+.ui-icon {
+    background-position: left center;
+    background-repeat: no-repeat;
+}
+
+.pan { 
+    background-image: url('../../spatialtools_files/images/pan.png') ; 
+}
+.refresh { 
+    background-image: url('../../spatialtools_files/images/refresh.png') ; 
+}
+.buffer { 
+    background-image: url('../../spatialtools_files/images/buffer.png') ; 
+}
+.centroid { 
+    background-image: url('../../spatialtools_files/images/centroid.png') ; 
+}
+.convexhull { 
+    background-image: url('../../spatialtools_files/images/convexhull.png') ; 
+}
+.boundary { 
+    background-image: url('../../spatialtools_files/images/boundary.png') ; 
+}
+.union { 
+    background-image: url('../../spatialtools_files/images/union.png') ; 
+}
+.intersection { 
+    background-image: url('../../spatialtools_files/images/intersection.png') ; 
+}
+.symdifference { 
+    background-image: url('../../spatialtools_files/images/symdifference.png') ; 
+}
+.difference { 
+    background-image: url('../../spatialtools_files/images/difference.png') ; 
+}
+.drawLine { 
+    background-image: url('../../spatialtools_files/images/get-profile.png') ; 
+}
+
+.ui-icon span {
+    margin-left: 20px
+}

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+  <head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.7.0/ol.css" type="text/css">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css"/>
+    <link href="http://fonts.googleapis.com/css?family=Days+One" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="assets/css/style_zoo.css" />
+    <title>Bringing pyModis to the web through ZOO-Project.[Demo]</title>
+    <script data-main="assets/js/spatialtools-py" src="assets/js/lib/require.js"></script>
+ </head>
+  <body>
+    <div class="container">
+      <nav class="navbar navbar-fixed-top navbar-default" role="navigation">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand navbar-shrink" href="http://zoo-project.org/new/Resources/Examples"><img src="http://zoo-project.org/img/zoo-sun-logo.png" class="img-responsive sun" style="display: inline;"> ZOO</a>
+            <span class="pm-demo-title">ZOO-Project | <span class="hidden-xs">Bringing pyModis to the web through ZOO-Project</span></span>
+          </div>	
+		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle"
+                data-toggle="dropdown"><i class="fa fa-info-circle"></i> <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><a href="./assets/js/spatialtools-py-app.js""><i class="fa fa-code"></i> view source</a></li>
+                  <li><a href="http://zoo-project.org" target="_blank"><i class=" fa icon-pm sml"></i> ZOO-Project</a></li>
+                  <li class="divider"></li>
+                  <li><a href="#" data-toggle="modal" data-target="#myModalCredits"><i class="fa fa-copyright"></i> credits</a></li>
+                </ul>
+              </li>
+            </ul>
+            </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+          </nav>
+        </div>
+      </nav>
+      <div class="navbar-offset"></div>
+      <div id="map">
+      </div>
+      <div class="row main-row">
+        <div class="col-sm-5 col-md-4 sidebar sidebar-left pull-left">
+          <div class="panel-group sidebar-body" id="accordion-left">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                  <a data-toggle="collapse" href="#download">
+                    <i class="fa fa-gears"></i>
+                    Download Modis Service parameters
+                  </a>
+                  <span class="pull-right slide-submenu">
+                    <i class="fa fa-chevron-left"></i>
+                  </span>
+                </h4>
+              </div>
+              <div id="download" class="panel-collapse collapse in" style="overflow:auto">
+                <div class="panel-body" style="overflow:auto">
+
+                </div>
+              </div>
+            </div>
+			
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                  <a data-toggle="collapse" href="#mosaic">
+                    <i class="fa fa-gears"></i>
+                    Mosic Modis Service parameters
+                  </a>
+                </h4>
+              </div>
+              <div id="mosaic" class="panel-collapse collapse in" style="overflow:auto">
+                <div class="panel-body" style="overflow:auto">
+
+
+                </div>
+              </div>
+            </div>
+
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                  <a data-toggle="collapse" href="#convert">
+                    <i class="fa fa-gears"></i>
+                    Convert Modis Service parameters
+                  </a>
+                </h4>
+              </div>
+              <div id="convert" class="panel-collapse collapse in" style="overflow:auto">
+                <div class="panel-body" style="overflow:auto">
+
+
+                </div>
+              </div>
+            </div>			
+			
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                  <a data-toggle="collapse" href="#properties">
+                    <i class="fa fa-info-circle"></i>
+                    Information
+                  </a>
+                </h4>
+              </div>
+              <div id="properties" class="panel-collapse collapse in">
+                <div class="panel-body">
+                  <p>
+                 This map demonstrates some of the pyModis WPS
+            services. Please see <a
+            href="#" target="_blank">pymodis.js</a> for global configuration and
+            definition of required JS files. For information relatives
+            to the application itself, refer to the <a
+            href="#" target="_blank">pymodis-app.js</a> file.
+                  </p>
+
+                  
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mini-submenu mini-submenu-left pull-left">
+        <i class="fa fa-list-alt"></i>
+      </div>
+    </div>
+
+ <div class="modal fade" id="myModalCredits" tabindex="-1" role="dialog" aria-labelledby="myModalCreditsLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">Credits</h4>
+      </div>
+	<div class="modal-body">
+  	<div class="alert alert-warning">
+    		<p>This is the <a href="http://zoo-project.org" target="_blank">ZOO-Project</a> OGR spatial tools  example, powered by <a href="http://zoo-project.org" target="_blank">ZOO-Project</a>, <a href="http://www.pymodis.org/" target="_blank">pyModis</a>, <a href="http://mapserver.org" target="_blank">MapServer</a> and <a href="http://openlayers.org" target="_blank">OpenLayers</a></p> 
+  	</div>
+       <p><span style="font-size:.85em;color:#CCC">This work was supported by a grant from the European Union's 7th Framework Programme (2007-2013) provided for the project <a href="http://publicamundi.eu" target="_blank">PublicaMundi</a> (GA no. 609608).</span></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="txt/template" id="addLayer_template">
+  <li class="list-group-item layerItem">
+   lcheck
+   <a href="ldata" class="accessLayer" target="_blank"> lname </a>
+   <a href="#" class="pull-right removeLayer"><i class="fa fa-close"></i></a>
+  </li>
+</script>
+
+  </body>
+</html>
