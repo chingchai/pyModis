@@ -82,8 +82,8 @@ requirejs.config({
 requirejs.config({ 
     config: {
         app: {
-            url: '/cgi-bin/zoo_loader.cgi',
-            delay: 2000,
+            url: '/cgi-bin/mm/zoo_loader.cgi',
+            delay: 3000,
         }
     } 
 });
