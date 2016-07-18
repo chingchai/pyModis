@@ -64,11 +64,103 @@
                 </h4>
               </div>
               <div id="download" class="panel-collapse collapse in" style="overflow:auto">
-                <div class="panel-body" style="overflow:auto">
+                <!--<div class="panel-body" style="overflow:auto"-->
+				<div class="panel-body" style="overflow: auto; height: 200px; max-height: 200px;">
+				<div data-role="popup" id="wps_Modis_Download" data-dismissible="false" data-overlay-theme="a" data-theme="c" class="pm-popup  ui-corner-all clearfix">
+					<div data-role="header" data-theme="a" class="ui-corner-top">
+					  <h3 id="run-wps-header">Modis Download</h3>
+					</div>
+					<div data-role="content" data-theme="d" class="ui-corner-bottom
+					  ui-content">
+					  <h4>Download MODIS Land Surface Temperature(LST)</h4>
+					  <p>Downloads MODIS data from NASA FTP servers. It can download large amounts of data and it can be profitably used with cron jobs to receive data with a fixed delay of time.</p>
+					<div class="ui-field-contain">
+					  <h4>DataInputs</h4>
+						
+					<div data-role="content" data-theme="d" class="ui-corner-bottom
+					  ui-content col-sm-12">
+					  <label for="wps_i_in">in</label>
+					  <span class="wps-title">Input path directory on the http/ftp.</span>
+					  <select type="text" class="form-control" name="wps_i_in" id="wps_i_in" data-ltype="string" value="" placeholder="type
+						..." data-clear-btn="true" data-mini="true">
+						 <option>MOLT</option>
+						 <option>MOLA</option>
+						 <option>MOTA</option>
+						</select>
+					 	<input type="text" name="wps_i_in" id="wps_i_in" class="form-control hide" data-ltype="string" value="MOLT" placeholder="type
+						..." data-clear-btn="true" data-mini="true">
+					  <p></p>
+					  </div>
 
+					<div data-role="content" data-theme="d" class="ui-corner-bottom
+					  ui-content col-sm-12">
+					  <label for="wps_i_product">product</label>
+					  <span class="wps-title">Input product name as on the http/ftp server.</span>
+					  <input type="text" name="wps_i_product" id="wps_i_product" class="form-control " data-ltype="string" value="MOD11A1.005" placeholder="type
+						..." data-clear-btn="true" data-mini="true">	
+					  <p></p>
+					  </div>					  
+						  
+					<div data-role="content" data-theme="d" class="ui-corner-bottom
+					  ui-content col-sm-12">
+					  <label for="wps_i_tiles">tiles</label>
+					  <span class="wps-title">Input a set of tiles to be downloaded.</span>  
+					  <input type="text" name="wps_i_tiles" id="wps_i_tiles" class="form-control " data-ltype="string" value="h27v07,h28v07" placeholder="type
+						..." data-clear-btn="true" data-mini="true">	
+					  <p></p>
+					  </div>			
+					  
+					<div data-role="content" data-theme="d" class="ui-corner-bottom
+					  ui-content col-sm-12">
+					  <label for="wps_i_today">today</label>
+					  <span class="wps-title">Input the day to start downloading.</span>
+					  <input type="text" name="wps_i_today" id="wps_i_today" class="form-control " data-ltype="string" value="2015-01-01" placeholder="type
+						..." data-clear-btn="true" data-mini="true">
+					  <p></p>
+					  </div>							  
+
+					<div data-role="content" data-theme="d" class="ui-corner-bottom
+					  ui-content col-sm-12">
+					  <label for="wps_i_enddate">enddate</label>
+					  <span class="wps-title">Input the day to end downloading.</span>
+					  <input type="text" name="wps_i_enddate" id="wps_i_enddate" class="form-control " data-ltype="string" value="2015-01-31" placeholder="type
+						..." data-clear-btn="true" data-mini="true">
+					  <p></p>
+					  </div>
+					  
+					  <!-- output modis download -->
+					  <h4>ProcessOutputs</h4>
+					  <div class="col-sm-12">
+					  <label for="wps_o_out">out</label>
+					  <span class="wps-title">Output Modis Download.</span>
+					  <select data-lid="out" class="form-control" id="format_wps_o_out">
+						<option>application/zip</option>
+					  </select>
+					  </div>
+
+					  </div>
+					  <div class="col-sm-12" style="margin-top:0.5em">
+						<div class="col-sm-3"><button id="btn-wps-execute" href="#" data-rel="close" class="btn btn-default" style="margin-left:
+						  0px !important;">Execute</button>
+						</div>
+						<div class="col-md-19">
+						  <div class="progress" style="margin-top: 0.5em;">
+							<div id="progress-process" class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+							  <span class="sr-only"></span>
+							</div>
+						  </div>
+						</div>
+					  </div>
+					  <div id="infoMessage" class="col-sm-12" style="margin-top:0.5em">
+						
+					  </div>
+
+					</div>
+					</div></div>
+			<!-- end download modis toolbox --> 	
                 </div>
               </div>
-            </div>
+
 			
             <div class="panel panel-default">
               <div class="panel-heading">
@@ -80,12 +172,64 @@
                 </h4>
               </div>
               <div id="mosaic" class="panel-collapse collapse in" style="overflow:auto">
-                <div class="panel-body" style="overflow:auto">
+			<div class="panel-body" style="overflow: auto; height: 200px; max-height: 200px;">
+				<div data-role="popup" id="wps_Modis_Mosaic" data-dismissible="false" data-overlay-theme="a" data-theme="c" class="pm-popup  ui-corner-all clearfix">
+					<div data-role="header" data-theme="a" class="ui-corner-top">
+					  <h3 id="run-wps-header">Modis Mosaic</h3>
+					</div>
+					<div data-role="content" data-theme="d" class="ui-corner-bottom
+					  ui-content">
+					  <h4>Mosic Modis Service</h4>
+					  <p>Mosaic modis data from hdf to GDAL formats using GDAL.</p>
+					<div class="ui-field-contain">
+					  <h4>DataInputs</h4>
+							  
+					<div data-role="content" data-theme="d" class="ui-corner-bottom
+					  ui-content col-sm-12">
+					  <label for="wps_m_tiles">tiles</label>
+					  <span class="wps-title">Input tiles.</span>
+					  <!--<input type="hidden" name="file" id="wps_m_tiles" value="http://myhost.net/tmp/6455ab26-403d-11e6-ae02-0800274bb48f.zip">-->
+					  <input type="text" name="wps_m_tiles" id="wps_m_tiles" class="form-control " data-ltype="string" value="http://myhost.net/tmp/6455ab26-403d-11e6-ae02-0800274bb48f.zip" placeholder="type
+						..." data-clear-btn="true" data-mini="true">
+					  <p></p>
+					  </div>					  
+					  
+					  <!-- output modis download -->
+					  <h4>ProcessOutputs</h4>
+					  <div class="col-sm-12">
+					  <label for="wps_o_out">out</label>
+					  <span class="wps-title">Output Modis Mosaic image.</span>
+					  <select data-lid="out" class="form-control" id="format_wps_o_out">
+						<option>image/tiff</option>
+						<option>image/png</option>
+						<option>text/xml</option>
+					  </select>
+					  </div>
 
+					  </div>
+					  <div class="col-sm-12" style="margin-top:0.5em">
+						<div class="col-sm-3"><button id="btn-wps-execute" href="#" data-rel="close" class="btn btn-default" style="margin-left:
+						  0px !important;">Execute</button>
+						</div>
+						<div class="col-md-19">
+						  <div class="progress" style="margin-top: 0.5em;">
+							<div id="progress-process" class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+							  <span class="sr-only"></span>
+							</div>
+						  </div>
+						</div>
+					  </div>
+					  <div id="infoMessage" class="col-sm-12" style="margin-top:0.5em">
+						
+					  </div>
 
+					</div>
+					</div></div>
+			<!-- end mosaic modis toolbox --> 	
+			
                 </div>
               </div>
-            </div>
+
 
             <div class="panel panel-default">
               <div class="panel-heading">
@@ -97,10 +241,77 @@
                 </h4>
               </div>
               <div id="convert" class="panel-collapse collapse in" style="overflow:auto">
-                <div class="panel-body" style="overflow:auto">
+			<div class="panel-body" style="overflow: auto; height: 200px; max-height: 200px;">
+				<div data-role="popup" id="wps_Modis_Mosaic" data-dismissible="false" data-overlay-theme="a" data-theme="c" class="pm-popup  ui-corner-all clearfix">
+					<div data-role="header" data-theme="a" class="ui-corner-top">
+					  <h3 id="run-wps-header">Convert Mosaic</h3>
+					</div>
+					<div data-role="content" data-theme="d" class="ui-corner-bottom
+					  ui-content">
+					  <h4>Convert Modis Service</h4>
+					  <p>Convert Modis data from hdf to GDAL formats.</p>
+					<div class="ui-field-contain">
+					  <h4>DataInputs</h4>
+							  
+					<div data-role="content" data-theme="d" class="ui-corner-bottom
+					  ui-content col-sm-12">
+					  <label for="wps_c_tiles">tiles</label>
+					  <span class="wps-title">Input tiles.</span>
+					  <!--<input type="hidden" name="file" id="wps_c_tiles" value="http://myhost.net/tmp/6455ab26-403d-11e6-ae02-0800274bb48f.zip">-->
+					  <input type="text" name="wps_c_tiles" id="wps_c_tiles" class="form-control " data-ltype="string" value="http://myhost.net/tmp/6455ab26-403d-11e6-ae02-0800274bb48f.zip" placeholder="type
+						..." data-clear-btn="true" data-mini="true">
+					  <p></p>
+					  </div>					  
 
+					<div data-role="content" data-theme="d" class="ui-corner-bottom
+					  ui-content col-sm-12">
+					  <label for="wps_c_res">res</label>
+					  <span class="wps-title">Input for output resolution.</span>
+					  <input type="text" name="wps_c_res" id="wps_c_res" class="form-control " data-ltype="integer" value="1000" placeholder="type
+						..." data-clear-btn="true" data-mini="true">
+					  <p></p>
+					  </div>							  
 
-                </div>
+					<div data-role="content" data-theme="d" class="ui-corner-bottom
+					  ui-content col-sm-12">
+					  <label for="wps_c_epsg">epsg</label>
+					  <span class="wps-title">Input the EPSG code for the preojection of output file.</span>
+					  <input type="text" name="wps_c_epsg" id="wps_c_epsg" class="form-control " data-ltype="integer" value="32647" placeholder="type
+						..." data-clear-btn="true" data-mini="true">
+					  <p></p>
+					  </div>
+					  
+					  <!-- output convert download -->
+					  <h4>ProcessOutputs</h4>
+					  <div class="col-sm-12">
+					  <label for="wps_o_out">out</label>
+					  <span class="wps-title">Output Modis Convert.</span>
+					  <select data-lid="out" class="form-control" id="format_wps_o_out">
+						<option>application/zip</option>
+					  </select>
+					  </div>
+
+					  </div>
+					  <div class="col-sm-12" style="margin-top:0.5em">
+						<div class="col-sm-3"><button id="btn-wps-execute" href="#" data-rel="close" class="btn btn-default" style="margin-left:
+						  0px !important;">Execute</button>
+						</div>
+						<div class="col-md-19">
+						  <div class="progress" style="margin-top: 0.5em;">
+							<div id="progress-process" class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+							  <span class="sr-only"></span>
+							</div>
+						  </div>
+						</div>
+					  </div>
+					  <div id="infoMessage" class="col-sm-12" style="margin-top:0.5em">
+						
+					  </div>
+
+					</div>
+					</div></div>
+			<!-- end convert modis toolbox --> 	
+			
               </div>
             </div>			
 			
