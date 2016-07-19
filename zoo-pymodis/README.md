@@ -790,7 +790,11 @@ Status: 200 OK
 </wps:ExecuteResponse>
 ```
 ![screenshot](http://i.imgur.com/sizbPwB.png "Result convert modis")
-![screenshot](http://i.imgur.com/VwDv6cz.png "Result convert modis ZipFile")
+![screenshot](http://i.imgur.com/VwDv6cz.png "Result convert modis Zipfile")
+
+## Create the template by use the web application to automatically generate the HTML form for accessing pyModis WPS services.
+first version template: https://github.com/chingchai/pyModis/tree/gsoc-2016/zoo-pymodis/app-service-web/appmodis
+![screenshot](http://i.imgur.com/roZADkz.png "first version template web application")
 
 ## ZOO Wiki
   - [ZOO-Wiki](http://zoo-project.org/trac/wiki/Bringing_pyModis_to_the_web_through_ZOO-Project_GSoC_2016)
