@@ -365,7 +365,7 @@ DescribeProcess: http://localhost/cgi-bin/mm/zoo_loader.cgi?request=DescribeProc
     </ProcessDescription>
 </wps:ProcessDescriptions>
 ```
-![screenshot](https://lh5.googleusercontent.com/B_G2cOp9eFj27T_FtE7p0GaHPrbcInfeDXFyaQ0iT6MMZI-DX-co8nym5rOBtzU6WcjezQ=w1841-h747 "Test downmodis module to download MODIS Data as a WPS service")
+![screenshot](http://i.imgur.com/LHgb6xY.png "Test downmodis module to download MODIS Data as a WPS service")
 
 ### Test the Execute request
 Execute: http://localhost/cgi-bin/mm/zoo_loader.cgi?request=Execute&service=WPS&version=1.0.0&Identifier=modis.download&DataInputs=tiles=h27v07,h28v07;today=2015-01-01;enddate=2015-01-05;product=MOD11A1.005;path=MOLT&ResponseDocument=Result@asReference=true
@@ -390,7 +390,7 @@ Execute: http://localhost/cgi-bin/mm/zoo_loader.cgi?request=Execute&service=WPS&
     </wps:ProcessOutputs>
 </wps:ExecuteResponse>
 ```
-![screenshot](https://lh5.googleusercontent.com/IcFMzAPiNSY246iN0YojLakBkRqVXsZSxz6_QKRmutBdUIv_G2gskvfEtLrFxvumxfNUfg=w1841-h747 "Result downmodis module")
+![screenshot](http://i.imgur.com/BrX1zyP.png "Result downmodis module")
 
 ### create mosaic service from convertmodis_gdal module
 - pymodis-services/cgi-env/modis/pymodis_service.py#L37
@@ -516,7 +516,7 @@ DescribeProcess: http://localhost/cgi-bin/mm/zoo_loader.cgi?request=DescribeProc
     </ProcessDescription>
 </wps:ProcessDescriptions>
 ```
-![screenshot](https://lh4.googleusercontent.com/Pta9RVlK6oUNIzngdviOdtYVg1a43EChyJgvKeuVjZMufTERF4SFfKS_ZmGUqpXFagC8gw=w1841-h747 "DescribeProcess mosaic service")
+![screenshot](http://i.imgur.com/h2hV0OW.png "DescribeProcess mosaic service")
 
 ### Test the Execute request
 Execute and accessing tiff as WCS GetMap Request: http://localhost/cgi-bin/mm/zoo_loader.cgi?request=Execute&service=WPS&version=1.0.0&Identifier=modis.download&DataInputs=tiles=h27v07,h28v07;today=2015-01-01;enddate=2015-01-05;product=MOD11A1.005;path=MOLT&ResponseDocument=Result@asReference=true
@@ -540,7 +540,7 @@ Execute and accessing tiff as WCS GetMap Request: http://localhost/cgi-bin/mm/zo
     </wps:ProcessOutputs>
 </wps:ExecuteResponse>
 ```
-![screenshot](https://lh5.googleusercontent.com/JMBb4D8C6MIZi9cB60TZV27d3gzaiTiC1vRaD_ncAyz9Zxox63lGKQqo_DGhLJdcpNSInQ=w1841-h745 "Result mosaic accessing a remote tiff as WCS GetMap Request")
+![screenshot](http://i.imgur.com/V2CjxR7.png "Result mosaic accessing a remote tiff as WCS GetMap Request")
 
 Execute and accessing tiff as WMS GetMap Request:
 http://localhost/cgi-bin/mm/zoo_loader.cgi?request=Execute&service=WPS&version=1.0.0&Identifier=modis.mosaic&DataInputs=tiles=reference@xlink:href=http://myhost.net/tmp/6455ab26-403d-11e6-ae02-0800274bb48f.zip&ResponseDocument=Result@asReference=true@mimeType=image/png
@@ -564,7 +564,7 @@ http://localhost/cgi-bin/mm/zoo_loader.cgi?request=Execute&service=WPS&version=1
     </wps:ProcessOutputs>
 </wps:ExecuteResponse>
 ```
-![screenshot](https://lh4.googleusercontent.com/zXZ10hirrIOdcHHSid_d681atZeP-nuRg7dRnuqVyA88T47HlWRMOOPc-5wFQShOUwoutw=w1841-h747 "Result mosaic accessing a remote tiff as WMS GetMap Request")
+![screenshot](http://i.imgur.com/3YsXSg0.png "Result mosaic accessing a remote tiff as WMS GetMap Request")
 
 ### create convert service from convertmodis_gdal module
 - pymodis-services/cgi-env/modis/pymodis_service.py#L67
@@ -756,7 +756,7 @@ DescribeProcess: http://localhost/cgi-bin/mm/zoo_loader.cgi?request=DescribeProc
     </ProcessDescription>
 </wps:ProcessDescriptions>
 ```
-![screenshot](https://lh5.googleusercontent.com/qdwYn4TOF9Xhwsha5c5P6d2KQYDXGAbOJvpEqv9pew3w3ShhjuYV0iARIMCO4OpPrcMiAg=w1841-h745 "DescribeProcess convert service")
+![screenshot](http://i.imgur.com/nhbUbeM.png "DescribeProcess convert service")
 
 ### Test the Execute request
 Execute Request on terminal: sudo ./zoo_loader.cgi "request=Execute&service=WPS&version=1.0.0&Identifier=modis.convert&DataInputs=tiles=reference@xlink:href=http://myhost.net/tmp/6455ab26-403d-11e6-ae02-0800274bb48f.zip;res=1000;epsg=32647&ResponseDocument=Result@asReference=true"
@@ -789,7 +789,7 @@ Status: 200 OK
     </wps:ProcessOutputs>
 </wps:ExecuteResponse>
 ```
-![screenshot](https://lh5.googleusercontent.com/9SMqfEBzCFJszRXByGWXsWUEwAw9F1DTmlGRmCqoCDLxdT0ruel4JbBUtKkDIYrVMD_-YQ=w1841-h745 "Result convert modis")
+![screenshot](http://i.imgur.com/sizbPwB.png "Result convert modis")
 
 ## ZOO Wiki
   - [ZOO-Wiki](http://zoo-project.org/trac/wiki/Bringing_pyModis_to_the_web_through_ZOO-Project_GSoC_2016)
