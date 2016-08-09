@@ -25,279 +25,33 @@
 * provided for the project PublicaMundi (GA no. 609608).
 */
 
-// REQUIRES OpenLayers 3.7.0
-
+require(['bootstrap', 'notify']);
 
 define([
-    'module', 'jquery', 'zoo', 'xml2json','ol'
-], function(module, $, Zoo, X2JS,ol) {
+    'module', 'jquery', 'zoo', 'xml2json','ol', 'hgn!tpl/describe_process_form'
+], function(module, $, Zoo, X2JS,ol,tpl_describeProcess) {
 
     var zoo = new Zoo({
         url: module.config().url,
         delay: module.config().delay,
     });
 
+    var currentLID=0;
     var mymodal = $('#myModal');
-
+    var mynotify = $('.top-right');
+    //var mapUrl = "http://zoo.dev.publicamundi.eu/cgi-bin/mapserv?map=/var/www/data/project_Untitled_0_test.map";
+    var mapUrl = "http://123.242.166.129:8080/geoserver/ows";
+    var map;
 
 
     function notify(text, type) {
-        /*mynotify.notify({
+        mynotify.notify({
             message: { text: text },
             type: type,
-        }).show();*/
+        }).show();
     }
 
-    function showModal(title, body) {
-        mymodal.find('.modal-body').text('');
-        mymodal.find('.modal-body').append(body);
-        mymodal.find('.modal-title').text(title);
-        var options = {};
-        mymodal.modal(options);
-    }
-
-    //OpenLayers.IMAGE_RELOAD_ATTEMPTS = 3;
-
-    var map, SubwayStops, layer;
-    var highlightOverlay,hover,multi;
-    var requestUrl;
-    var pop;
-
-    var activatedServices={
-	Mask: false,
-	BufferMask: false,
-	BufferRequest: false,
-	BufferRequestAndMask: false
-    };
-
-    function onPopupClose(){
-	if(pop)
-	    map.removePopup(pop);
-    }
-
-    function createPopup(){
-	var tmp=arguments[0].geometry.getCentroid();
-	if(pop)
-	    map.removePopup(pop);
-	var attrs='<div style="color: #000;"><table>';
-	for(var i in arguments[0].data)
-	    if(i!="gml_id")
-		attrs+="<tr><td width='100' style='font-weight: bold;'>"+i+"</td><td>"+arguments[0].data[i]+"</td></tr>";
-	attrs+="</table></div>";
-	pop=new OpenLayers.Popup.FramedCloud("Information",
-					     arguments[0].geometry.getBounds().getCenterLonLat(),
-					     new OpenLayers.Size(100,100),
-					     "<h2>"+arguments[0].data.name+"</h2>"+attrs,
-					     null, true,onPopupClose);
-	map.addPopup(pop);
-    }
-
-    function unSelect(){
-	if(pop)
-	    map.removePopup(pop);
-	//alert(arguments[0]);
-    }
-
-    function parseMapServerId(){
-	try{
-	    var sf=arguments[0].split(".");
-	    return sf[0]+"."+sf[1].replace(/ /g,'');
-	}catch(e){}
-    }
-
-    function toggleControl(element) {
-	for(key in mapControls) {
-	    var control = mapControls[key];
-	    //alert ($(element).is('.ui-state-active'));
-	    if(element.name == key && $(element).is('.ui-state-active')) {
-		control.activate();
-	    } else {
-		control.deactivate();
-	    }
-	}
-    }
-
-    function restartDisplay(){
-	var tmp=[highlightOverlay,hover,multi];
-	for(i=0;i<tmp.length;i++)
-	    if(tmp[i].getSource().getFeatures().length>=1)
-		tmp[i].getSource().removeFeature(tmp[i].getSource().getFeatures()[0]);
-	slist=$(".single-process:not(.ui-state-disabled)");
-	for(var i=0;i<slist.length;i++)
-	    slist[i].style.display='none';
-	mlist=$(".multi-process:not(.ui-state-disabled)");
-	for(var i=0;i<mlist.length;i++)
-	    mlist[i].style.display='none';
-    }
-
-    function refreshDisplay(){
-	elist=$(".single-process:not(.ui-state-disabled)");
-	for(var i=0;i<elist.length;i++)
-	    elist[i].style.display='block';
-	if(hover.getSource().getFeatures().length>=1){
-	    slist=$(".multi-process:not(.ui-state-disabled)");
-	    for(var i=0;i<slist.length;i++)
-		slist[i].style.display='block';
-	}
-    }
-
-    function singleProcessing(aProcess) {
-	//alert(requestUrl);
-	if (highlightOverlay.getSource().getFeatures().length== 0)
-	    return alert("No feature selected!");
-	if(multi.getSource().getFeatures().length>=1)
-  	    multi.getSource().removeFeature(multi.getSource().getFeatures()[0]);
-	var started=true;
-	var dep=hover;
-	if(arguments.length>1){
-	    dep=arguments[1];
-	    started=false;
-	}
-	var xlink = requestUrl.replace(/application/g,"text").replace(/json/g,"xml");
-	var inputs=[{"identifier":"InputPolygon","href":xlink,"mimeType":"text/xml"}];
-
-	var isChain2=false;
-	if(aProcess=="SimpleChain2"){
-	    aProcess="BufferRequest";
-	    isChain2=true;
-	}
-
-	/*for(var i in activatedServices)
-	    if(aProcess==i){
-		inputs[0].identifier="InputData";
-		break;
-	    }*/
-	if (aProcess == 'Buffer' || aProcess == 'BufferPy') {
-	    inputs.push({"identifier":"BufferDistance","value":"1","dataType":"integer"})
-	}
-
-
-	console.log(inputs);
-        zoo.execute({
-            identifier: aProcess,
-            dataInputs: inputs,
-            dataOutputs: [{"identifier":"Result","mimeType":"application/json","type":"raw"}],
-            type: 'POST',
-            storeExecuteResponse: false,
-            success: function(data) {
-		if(hover.getSource().getFeatures().length>0)
-		    hover.getSource().removeFeature(hover.getSource().getFeatures()[0]);
-		notify('Execute succeded', 'success');
-		var GeoJSON = new ol.format.GeoJSON();
-		var features = GeoJSON.readFeatures(data,
-						    {dataProjection: 'EPSG:4326',
-						     featureProjection: 'EPSG:3857'});
-		hover.getSource().addFeatures(features);
-		refreshDisplay();
-            },
-            error: function(data) {
-		notify('Execute failed:' +data.ExceptionReport.Exception.ExceptionText, 'danger');
-            }
-        });
-
-	if(isChain2 && started)
-	    singleProcessing("BufferMask",hover_);
-
-    }
-
-    function multiProcessing(aProcess) {
-	if (highlightOverlay.getSource().getFeatures().length == 0 || hover.getSource().getFeatures().length == 0)
-	    return alert("Not enough feature created!");
-
-	var xlink = requestUrl;
-	var GeoJSON = new ol.format.GeoJSON();
-	/*lfeatures=[];
-	for(var i in hover.features){
-	    lfeatures.push(hover.features[i].clone());
-	    lfeatures[i].geometry=lfeatures[i].geometry.transform(mercator,wgs84);
-	}*/
-	//console.log(hover.getFeatures().item(0));
-	//litem=hover.getFeatures().item(0).clone();
-	//console.log(litem);
-
-	val=GeoJSON.writeFeatures([hover.getSource().getFeatures()[0]],
-				      {dataProjection: 'EPSG:4326',
-				       featureProjection: 'EPSG:3857'});
-	console.log(val);
-	var inputs=[{"identifier":"InputEntity1","href":xlink,"mimeType":"text/xml"},
-		   {"identifier":"InputEntity2","value":val,"mimeType":"application/json"}];
-
-        zoo.execute({
-            identifier: aProcess,
-            dataInputs: inputs,
-            dataOutputs: [{"identifier":"Result","mimeType":"application/json","type":"raw"}],
-            type: 'POST',
-            storeExecuteResponse: false,
-            success: function(data) {
-		if(multi.getSource().getFeatures().length>0)
-		    multi.getSource().removeFeature(multi.getSource().getFeatures()[0]);
-		notify('Execute succeded', 'success');
-		console.log(data);
-		var GeoJSON = new ol.format.GeoJSON();
-		var features = GeoJSON.readFeatures(data,
-						    {dataProjection: 'EPSG:4326',
-						     featureProjection: 'EPSG:3857'});
-		//console.log(features);
-		/*if(multi.features)
-		    multi.removeFeatures(multi.features);
-		for(var j in features){
-		    features[j].geometry=features[j].geometry.transform(wgs84,mercator);
-		}
-		multi.addFeatures(features);*/
-		//if(features.getLength()>0)
-		multi.getSource().addFeatures(features);
-            },
-            error: function(data) {
-		notify('Execute failed:' +data.ExceptionReport.Exception.ExceptionText, 'danger');
-            }
-        });
-
-    }
-
-    function activateService(){
-	try{
-	    $("#buttonBar").append('<a href="#" class="fg-button ui-state-default ui-text-only ui-corner-all single-process process" title="'+(arguments[0]!="SimpleChain2"?arguments[0]:"BufferRequestAndMask")+'" name="'+(arguments[0]!="SimpleChain2"?arguments[0]:"BufferRequestAndMask")+'" onclick="app.singleProcessing(\''+(arguments[0]!="SimpleChain2"?arguments[0]:"SimpleChain2")+'\');"> '+(arguments[0]!="SimpleChain2" && arguments[0]!="BufferMask" && arguments[0]!="BufferRequest"?arguments[0]:(arguments[0]!="BufferMask" && arguments[0]!="BufferRequest"?"Buffer Request and Mask":arguments[0]!="BufferRequest"?"Buffer Mask":"Buffer Request"))+' </a>');
-
-	    elist=$('.process');
-	    for(var i=0;i<elist.length;i++){
-		elist[i].style.display='none';
-	    }
-
-	}catch(e){
-	    alert(e);
-	}
-    }
-
-    function applyMargins() {
-        var leftToggler = $(".mini-submenu-left");
-        if (leftToggler.is(":visible")) {
-          $("#map .ol-zoom")
-		.css("margin-left", 0)
-		.removeClass("zoom-top-opened-sidebar")
-		.addClass("zoom-top-collapsed");
-        } else {
-            $("#map .ol-zoom")
-		.css("margin-left", $(".sidebar-left").width())
-		.removeClass("zoom-top-opened-sidebar")
-		.removeClass("zoom-top-collapsed");
-        }
-    }
-
-    function isConstrained() {
-        return $(".sidebar").width() == $(window).width();
-    }
-
-    function applyInitialUIState() {
-        if (isConstrained()) {
-            $(".sidebar-left .sidebar-body").fadeOut('slide');
-            $('.mini-submenu-left').fadeIn();
-        }
-    }
-
-
-    //
     var initialize = function() {
-        self = this;
 
      $(function(){
 
@@ -316,190 +70,88 @@ define([
           applyMargins();
         });
 
-	//var main_url="http://zoo-project.org:8080/geoserver/ows";
-  var main_url="http://123.242.166.129:8080/geoserver/ows";
-	var proxy="http://zoo-project.org/cgi-bin/proxy.cgi?url="
-	//var typename="topp:states";
+	console.log('step 0');
+	 //3.47201366356192 43.2764995969651 3.81130212712671 43.5081449510672
 
-	var wmsSource1=new ol.source.ImageWMS({
-	    url: main_url,
-	    params: {'LAYERS': 'plkwater:modis_grid'},
-	    serverType: 'geoserver'
-	});
-
-  var wmsSource2=new ol.source.ImageWMS({
-      url: main_url,
-      params: {'LAYERS': ' 	plkwater:modis_point'},
-      serverType: 'geoserver'
-  });
-
-	var layers = [
-	    new ol.layer.Tile({
-		source: new ol.source.OSM()
-	    }),
-	    new ol.layer.Image({
-		//extent: [-13884991, 2870341, -7455066, 6338219],
-		source: wmsSource1
-      }),
-      new ol.layer.Image({
-    source: wmsSource2
-      })
-	];
-	map = new ol.Map({
-	    layers: layers,
+map = new ol.Map({
+	    layers: new ol.Collection(),
 	    target: 'map',
 	    view: new ol.View({
-		center: [-10997148, 4569099],
-		zoom: 3
+		center: ol.proj.transform([0.00,0.00], 'EPSG:4326', 'EPSG:3857'),
+		zoom: 2
 	    })
 	});
 
-	var parser = new ol.format.GeoJSON();
-	var style = new ol.style.Style({
-	    fill: new ol.style.Fill({
-		color: 'rgba(255,255,255,0.5)'
-	    }),
-	    stroke: new ol.style.Stroke({
-		color: 'rgba(255,255,255,0.5)',
-		width: 4
-	    }),
-	    text: new ol.style.Text({
-		font: '12px Calibri,sans-serif',
-		fill: new ol.style.Fill({
-		    color: '#000'
-		}),
-		stroke: new ol.style.Stroke({
-		    color: '#fff',
-		    width: 3
-		})
-	    })
-	});
+
 	var style1 = new ol.style.Style({
-	    fill: new ol.style.Fill({
-		color: 'rgba(110,110,110,0.5)'
-	    }),
-	    stroke: new ol.style.Stroke({
-		color: 'rgba(110,110,110,0.5)',
-		width: 4
-	    }),
-	    text: new ol.style.Text({
-		font: '12px Calibri,sans-serif',
+            image: new ol.style.Circle({
+		radius: 5,
 		fill: new ol.style.Fill({
-		    color: '#000'
+		    color: 'rgba(254,252,234,1)'
 		}),
 		stroke: new ol.style.Stroke({
-		    color: '#fff',
-		    width: 3
+		    color: 'rgba(102,62,5,1)'
 		})
 	    })
 	});
-	var style2 = new ol.style.Style({
-	    fill: new ol.style.Fill({
-		color: 'rgba(0,0,0,0.4)'
-	    }),
-	    stroke: new ol.style.Stroke({
-		color: 'rgba(0,0,0,0.4)',
-		width: 4
-	    })
-	});
-	var styles = [style];
-	var myproj=new ol.proj.Projection({
-	    code: "EPSG:4326"
-	});
-	console.log(myproj);
 
-	highlightOverlay = new ol.layer.Vector({
+  layerOSM=new ol.layer.Tile({
+    opacity: 0.7,
+    source: new ol.source.OSM()
+	});
+
+	 map.addLayer(layerOSM);
+
+   modisgrd=new ol.layer.Image({
+     source: new ol.source.ImageWMS({
+         url: mapUrl,
+         params: {'LAYERS': 'plkwater:modis_grid'},
+         serverType: 'geoserver'
+     })
+   });
+   map.addLayer(modisgrd);
+
+   modispnt=new ol.layer.Image({
+     source: new ol.source.ImageWMS({
+         url: mapUrl,
+         params: {'LAYERS': 'plkwater:modis_point'},
+         serverType: 'geoserver'
+     })
+   });
+   map.addLayer(modispnt);
+
+  // layer=new ol.layer.Tile({
+  //        visible: true,
+  //        source: new ol.source.TileWMS({
+  //             url: mapUrl,
+  //             params: {'LAYERS': "Landsat8Extract", 'TILED': true},
+  //             serverType: 'mapserver'
+  //            })
+  //        });
+  //
+	//  map.addLayer(layer);
+
+	layer = new ol.layer.Vector({
 	    map: map,
 	    source: new ol.source.Vector({
 		features: new ol.Collection(),
 		useSpatialIndex: false // optional, might improve performance
 	    }),
-	    style: style,
 	    updateWhileAnimating: true, // optional, for instant visual feedback
 	    updateWhileInteracting: true // optional, for instant visual feedback
 	});
-	hover = new ol.layer.Vector({
+
+	SubwayStops = new ol.layer.Vector({
 	    map: map,
 	    source: new ol.source.Vector({
 		features: new ol.Collection(),
-		useSpatialIndex: false // optional, might improve performance
+		useSpatialIndex: false
 	    }),
 	    style: style1,
-	    updateWhileAnimating: true, // optional, for instant visual feedback
-	    updateWhileInteracting: true // optional, for instant visual feedback
-	});
-	multi = new ol.layer.Vector({
-	    map: map,
-	    source: new ol.source.Vector({
-		features: new ol.Collection(),
-		useSpatialIndex: false // optional, might improve performance
-	    }),
-	    style: style2,
-	    updateWhileAnimating: true, // optional, for instant visual feedback
-	    updateWhileInteracting: true // optional, for instant visual feedback
-	});
-	var toto=[highlightOverlay,hover,multi];
-	for(i=0;i<toto.length;i++)
-	    map.addLayer(toto[i]);
-	/*highlightOverlay = new ol.FeatureOverlay({
-	    style: style,
-	    map: map
-	});
-	hover = new ol.FeatureOverlay({
-	    style: style1,
-	    map: map
-	});
-	multi = new ol.FeatureOverlay({
-	    style: style2,
-	    map: map
-	});*/
-	map.on('singleclick', function(evt) {
-	    var view = map.getView();
-	    var url = wmsSource.getGetFeatureInfoUrl(evt.coordinate,
-					view.getResolution(), view.getProjection(),
-					{'INFO_FORMAT': 'application/json'/*'INFO_FORMAT': 'application/vnd.ogc.gml'*/});
-	    requestUrl=proxy+encodeURIComponent(url);
-	    console.log(requestUrl);
-	    $.ajax(requestUrl).then(function(response) {
-		if(highlightOverlay.getSource().getFeatures().length>0)
-		    highlightOverlay.getSource().removeFeature(highlightOverlay.getSource().getFeatures()[0]);
-		console.log(response);
-		var features = parser.readFeatures(response,
-						   {dataProjection: 'EPSG:4326',
-						    featureProjection: 'EPSG:3857'});
-		console.log(features);
-		highlightOverlay.getSource().addFeatures(features);
-		console.log("ok");
-
-		refreshDisplay();
-	    });
+	    updateWhileAnimating: true,
+	    updateWhileInteracting: true
 	});
 
-	zoo.getCapabilities({
-	    type: 'POST',
-	    success: function(data){
-		restartDisplay();
-		var processes=data["Capabilities"]["ProcessOfferings"]["Process"];
-		for(var i in activatedServices){
-		    for(var j=0;j<processes.length;j++)
-			if(i==processes[j].Identifier){
-			    activateService(i);
-			    activatedServices[i]=true;
-			    if(activatedServices["BufferRequest"] && activatedServices["BufferMask"] && !hasSimpleChain){
-				activateService("SimpleChain2");
-				activatedServices["BufferRequestAndMask"]=true;
-				hasSimpleChain=true;
-			    }
-			    if(i=="BufferMask")
-				if(activatedServices["BufferRequest"]){
-				    activateService("SimpleChain2");
-				    activatedServices["BufferRequestAndMask"]=true;
-				}
-			    break;
-			}
-		}
-	    }
-	});
 
         $(window).on("resize", applyMargins);
 
@@ -507,251 +159,208 @@ define([
         applyInitialUIState();
         applyMargins();
 
+	 $("#serviceIdentifier").change(function(){
+	     getDescription($(this).val());
+	 });
+	 getDescription($("#serviceIdentifier").val());
     });
+    }
 
+    function getDescription(identifier){
+	$("#layers,#layers_display").find(".panel-body").css({"height":($(window).height()/3)+"px"});
+	$("#layers,#layers_display").find(".panel-body").css({"max-height":($(window).height()/3)+"px"});
+	zoo.describeProcess({
+	    identifier: identifier,
+	    type: "POST",
+	    success: function(data) {
+		data["Identifier1"]=data.ProcessDescriptions.ProcessDescription.Identifier.__text.replace(/\./g,"__");
+		data.ProcessDescriptions.ProcessDescription.Identifier1=data.ProcessDescriptions.ProcessDescription.Identifier.__text.replace(/\./g,"__");
+		for(var i in data.ProcessDescriptions.ProcessDescription.DataInputs.Input){
+		    if(data.ProcessDescriptions.ProcessDescription.DataInputs.Input[i]._minOccurs=="0")
+			data.ProcessDescriptions.ProcessDescription.DataInputs.Input[i].optional=true;
+		    else
+			data.ProcessDescriptions.ProcessDescription.DataInputs.Input[i].optional=false;
+		}
+		var details =  tpl_describeProcess(data);
+		$(".main-row").find(".panel-body").first().html(details);
+		$("#btn-wps-execute").click(function(){
+		    launchProcessing(identifier);
+		});
+	    },
+	    error: function(data) {
+		notify('DescribeProcess failed', 'danger');
+	    }
+	});
+    }
+
+    var filename="http://geolabs.fr/dl/Landsat8Extract1.tif";
+    function launchProcessing(aProcess) {
+	notify('Running '+aProcess+' service','info');
+	var iparams=[];
+	$("#layers").find(".pm-popup").find("input[type=text],select").each(function(){
+	    var lname=$(this).attr("id").replace(/wps_i_/g,"");
+	    console.log(lname);
+	    if($(this).is(":visible") && lname!=$(this).attr("id"))
+		iparams.push({
+		    identifier: lname,
+		    value: $(this).val(),
+		    dataType: "string"
+		});
+	});
+	$("#layers").find(".pm-popup").find("input[type=hidden]").each(function(){
+	    var lname=$(this).attr("id").replace(/wps_i_/g,"");
+	    console.log(lname);
+	    if($(this).parent().is(":visible") && lname!=$(this).attr("id"))
+		iparams.push({
+		    identifier: lname,
+		    href: $(this).val(),
+		    mimeType: "image/tiff"
+		});
+	});
+	var oparams=[];
+	$("#layers").find(".pm-popup").find("select").each(function(){
+	    var lname=$(this).attr("id").replace(/format_wps_o_/g,"");
+	    console.log(lname);
+	    if($(this).is(":visible") && lname!=$(this).attr("id"))
+		oparams.push({
+		    identifier: lname,
+		    mimeType: $(this).val(),
+		    asReference: "true"
+		});
+	});
+	console.log(iparams);
+	console.log(oparams);
+	var progress=$("#progress-process");
+	zoo.execute({
+	    identifier: aProcess,
+	    dataInputs: iparams,
+	    dataOutputs: oparams,
+	    type: 'POST',
+            storeExecuteResponse: true,
+            status: true,
+            success: function(data, launched) {
+		console.log("**** SUCCESS ****");
+		console.log(launched);
+		notify("Execute asynchrone launched: "+launched.sid, 'info');
+
+		// Polling status
+		zoo.watch(launched.sid, {
+                    onPercentCompleted: function(data) {
+			console.log("**** PercentCompleted ****");
+			console.log(data);
+
+			progress.css('width', (data.percentCompleted)+'%');
+			progress.text(data.text+' : '+(data.percentCompleted)+'%');
+			progress.attr("aria-valuenow",data.percentCompleted);
+			$("#infoMessage").html(data.text+' : '+(data.percentCompleted)+'%');
+                    },
+                    onProcessSucceeded: function(data) {
+			console.log("**** ProcessSucceeded ****");
+			//console.log(data);
+
+			progress.css('width', (100)+'%');
+			progress.text(data.text+' : '+(100)+'%');
+			progress.removeClass("progress-bar-info").addClass("progress-bar-success");
+			progress.attr("aria-valuenow",100);
+			$("#infoMessage").html(data.text+' : '+(100)+'%');
+
+			notify(aProcess+' service run successfully','success');
+			console.log(data);//.ExecuteResponse.ProcessOutputs.Output.Reference._href);
+			var ldata=data.result.ExecuteResponse.ProcessOutputs.Output;
+			if(!$.isArray(ldata))
+			    ldata=[data.result.ExecuteResponse.ProcessOutputs.Output];
+			for(var a=0;a<ldata.length;a++){
+			    console.log(ldata[a]);
+			    var lmapUrl=ldata[a].Reference._href.split('&')[0];
+			    console.log(lmapUrl);
+			    var content=$("#addLayer_template")[0].innerHTML.replace(/lname/g,ldata[a].Identifier.toString());
+			    if(lmapUrl.replace(/map/g,"")!=lmapUrl){
+				layer=new ol.layer.Tile({
+				    visible: true,
+				    source: new ol.source.TileWMS({
+					url: lmapUrl,
+					params: {'LAYERS': ldata[a].Identifier.toString(), 'TILED': true},
+					serverType: 'mapserver'
+				    })
+				});
+				map.addLayer(layer);
+				content=content.replace(/ldata/g,"#");
+				content=content.replace(/lcheck/g,'<input id="layerd'+currentLID+'" name="name" type="checkbox" checked="checked" />');
+				currentLID+=1;
+			    }else{
+				content=content.replace(/ldata/g,ldata[a].Reference._href);
+				content=content.replace(/lcheck/g,'<input name="name" type="checkbox" checked="checked" disabled="disabled" />');
+			    }
+			    console.log(content);
+			    $("#layers_display").find(".list-group").first().append(content);
+			    $("#layers_display").find(".layerItem").find("input[type=checkbox]").each(function(){
+				$(this).off("change");
+				$(this).on("change",function(){
+				    var lid=parseInt($(this).attr("id").replace(/layerd/g,""));
+				    map.getLayers().item(2+lid).setVisible($(this).is(":checked"));
+				});
+			    });
+			    $("#layers_display").find(".removeLayer").each(function(){
+				$(this).off("click");
+				$(this).on("click",function(){
+				    if(!$(this).prev().prev().is(":disabled")){
+					var lid=parseInt($(this).prev().prev().attr("id").replace(/layerd/g,""));
+					map.getLayers().item(2+lid).setVisible(false);
+				    }
+				    $(this).parent().remove();
+				});
+			    });
+			}
+                    },
+                    onError: function(data) {
+			console.log("**** onError ****");
+			console.log(data);
+			notify("Execute asynchrone failed", 'danger');
+                    },
+		});
+
+            },
+            error: function(data) {
+		        notify('Execute failed:' +data.ExceptionReport.Exception.ExceptionText, 'danger');
+            }
+        });
     }
 
 
+      function applyMargins() {
+        var leftToggler = $(".mini-submenu-left");
+        if (leftToggler.is(":visible")) {
+          $("#map .ol-zoom")
+            .css("margin-left", 0)
+            .removeClass("zoom-top-opened-sidebar")
+            .addClass("zoom-top-collapsed");
+        } else {
+          $("#map .ol-zoom")
+            .css("margin-left", $(".sidebar-left").width())
+            .removeClass("zoom-top-opened-sidebar")
+            .removeClass("zoom-top-collapsed");
+        }
+      }
 
-    //
-    var getCapabilities = function (params) {
 
-        //var target = $(params.target);
 
-        zoo.getCapabilities({
-            type: params.method,
-            success: function(data) {
+      function isConstrained() {
+        return $(".sidebar").width() == $(window).width();
+      }
 
-                // Define some usefull functions for templating.
-                data.setUpIndex = function() {
-                    return ++window['INDEX']||(window['INDEX']=0);
-                };
-                data.getIndex = function() {
-                    return window['INDEX'];
-                };
-                data.resetIndex = function() {
-                    window['INDEX']=null;
-                    return;
-                };
-		console.log(data);
-                // Render.
-                var accordion = tpl_getCapabilities(data);
-                //target.append(accordion);
-                showModal("test", accordion)
+      function applyInitialUIState() {
+        if (isConstrained()) {
+          $(".sidebar-left .sidebar-body").fadeOut('slide');
+          $('.mini-submenu-left').fadeIn();
+        }
+      }
 
-                // Details button
-                $('.showdetails').on('click', function(e) {
-                    e.preventDefault();
-                    console.log(this.dataset);
-
-                    var $this = $(this);
-                    var $collapse = $this.closest('.panel-body').find('.collapse');
-
-                    zoo.describeProcess({
-                        identifier: this.dataset.identifier,
-                        success: function(data) {
-                            var details =  tpl_describeProcess(data);
-
-                            $collapse.hide();
-                            $collapse.text('');
-                            $collapse.append(details);
-                            $collapse.show();
-                        },
-                        error: function(data) {
-                            $collapse.hide();
-                            $collapse.text('');
-                            $collapse.append("ERROR");
-                            $collapse.show();
-                        }
-                    });
-                });
-            },
-            error: function(data) {
-                notify('GetCapabilities failed', 'danger');
-                //target.append('ERROR');
-            }
-        });
-    };
-
-    //
-    var describeProcess = function(params) {
-        //var target = $(params.target);
-
-        zoo.describeProcess({
-            identifier: params.identifier,
-            type: params.method,
-            success: function(data) {
-                var details =  tpl_describeProcess(data);
-                //target.text('');
-                //target.append(details);
-
-                var title = 'DescribeProcess '+params.identifier;
-                showModal(title, details);
-
-            },
-            error: function(data) {
-                notify('DescribeProcess failed', 'danger');
-            }
-        });
-    };
-
-    //
-    var executeSynchrone = function(params) {
-        var target = $(params.target);
-
-        notify('Calling Execute synchrone ...', 'info');
-
-        zoo.execute({
-          identifier: params.identifier,
-          dataInputs: params.inputs ? JSON.parse(params.inputs) : null,
-          dataOutputs: params.outputs ? JSON.parse(params.outputs) : null,
-          type: params.method,
-          storeExecuteResponse: false,
-          success: function(data) {
-            notify('Execute succeded', 'success');
-            var details =  tpl_executeResponse(data);
-            target.text('');
-            target.append(details);
-
-            var output = data.ExecuteResponse.ProcessOutputs.Output;
-            console.log('======== OUTPUT ========');
-            console.log(output);
-            if (output.hasOwnProperty('Data')) {
-                console.log("FOUND DATA");
-                if (output.Data.hasOwnProperty('ComplexData')) {
-                    console.log("FOUND COMPLEX DATA");
-                    if (output.Data.ComplexData.hasOwnProperty('__cdata')) {
-                        console.log('FOUND CDATA');
-                        showModal('Execute '+params.identifier, output.Data.ComplexData.__cdata);
-                    }
-                    else {
-                        console.log('SHOWING COMPLEX DATA');
-                        console.log(output.Data.ComplexData);
-                        var _x2js = new X2JS({
-                            arrayAccessFormPaths: [
-                            'ProcessDescriptions.ProcessDescription.DataInputs.Input',
-                            'ProcessDescriptions.ProcessDescription.DataInputs.Input.ComplexData.Supported.Format',
-                            'ProcessDescriptions.ProcessDescription.ProcessOutputs.Output',
-                            'ProcessDescriptions.ProcessDescription.ProcessOutputs.Output.ComplexOutput.Supported.Format',
-                            'Capabilities.ServiceIdentification.Keywords'
-                            ],
-                        });
-                        showModal('Execute '+params.identifier, _x2js.json2xml_str(output.Data.ComplexData));
-                    }
-                }
-            } else if (output.hasOwnProperty('Reference')) {
-                console.log("FOUND REFERENCE");
-                showModal('Execute '+params.identifier, output.Reference._href);
-            }
-          },
-          error: function(data) {
-            notify('Execute failed:' +data.ExceptionReport.Exception.ExceptionText, 'danger');
-          }
-        });
-
-    };
-
-    //
-    var executeAsynchrone = function(params) {
-        var target = $(params.target);
-
-        notify('Calling Execute asynchrone ...', 'info');
-
-        zoo.execute({
-          identifier: params.identifier,
-          dataInputs: params.inputs ? JSON.parse(params.inputs) : null,
-          dataOutputs: params.outputs ? JSON.parse(params.outputs) : null,
-          type: params.method,
-          storeExecuteResponse: true,
-          status: true,
-
-          success: function(data) {
-            console.log("**** SUCCESS ****");
-            notify('Execute succeded', 'success');
-            var details =  tpl_executeResponse_async(data);
-            target.text('');
-            target.append(details);
-          },
-          error: function(data) {
-            notify('Execute failed', 'danger');
-          }
-        });
-
-    }
-
-    //
-    var longProcessDemo = function(params) {
-
-        var progress = $(params.target);
-        progress.removeClass("progress-bar-success").addClass("progress-bar-info");
-
-        zoo.execute({
-          identifier: params.identifier,
-          type: params.method,
-          dataInputs: params.inputs ? JSON.parse(params.inputs) : null,
-          dataOutputs: params.outputs ? JSON.parse(params.outputs) : null,
-          storeExecuteResponse: true,
-          status: true,
-          success: function(data, launched) {
-            console.log("**** SUCCESS ****");
-            console.log(launched);
-            notify("Execute asynchrone launched: "+launched.sid, 'info');
-
-            // Polling status
-            zoo.watch(launched.sid, {
-                onPercentCompleted: function(data) {
-                    console.log("**** PercentCompleted ****");
-                    console.log(data);
-
-                    progress.css('width', (data.percentCompleted)+'%');
-                    progress.text(data.text+' : '+(data.percentCompleted)+'%');
-
-                },
-                onProcessSucceeded: function(data) {
-                    //console.log("**** ProcessSucceeded ****");
-                    //console.log(data);
-
-                    progress.css('width', (100)+'%');
-                    progress.text(data.text+' : '+(100)+'%');
-                    progress.removeClass("progress-bar-info").addClass("progress-bar-success");
-
-                    // TODO: multiple output
-                    if (data.result.ExecuteResponse.ProcessOutputs) {
-                        var output = data.result.ExecuteResponse.ProcessOutputs.Output;
-                        var id = output.Identifier.__text;
-                        var text = output.Data.LiteralData.__text;
-                        console.log(id+': '+text);
-                        notify("Execute asynchrone "+id+': '+text, 'success');
-                    }
-                },
-                onError: function(data) {
-                    console.log("**** onError ****");
-                    console.log(data);
-                    notify("Execute asynchrone failed", 'danger');
-                },
-            });
-          },
-          error: function(data) {
-            console.log("**** ERROR ****");
-            console.log(data);
-            notify("Execute asynchrone failed", 'danger');
-
-          },
-
-        });
-    };
 
     // Return public methods
     return {
         initialize: initialize,
-        singleProcessing: singleProcessing,
-        multiProcessing: multiProcessing,
-        restartDisplay: restartDisplay,
-        describeProcess: describeProcess,
-        getCapabilities: getCapabilities,
-        executeSynchrone: executeSynchrone,
-        executeAsynchrone: executeAsynchrone,
-        longProcessDemo: longProcessDemo
+        getDescription: getDescription,
+	cgalProcessing: launchProcessing
     };
 
 
