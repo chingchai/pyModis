@@ -36,6 +36,11 @@ requirejs.config({
         jquery: 'js/lib/jquery/jquery-2.1.1.min',
         bootstrap: 'js/lib/bootstrap-3.1.1-dist/js/bootstrap.min',
 
+        notify: 'js/lib/bootstrap-notify',
+        treeview: 'js/lib/treeview',
+        contextmenu: 'js/lib/bootstrap-contextmenu',
+        slider: 'js/lib/bootstrap-slider',
+
         hogan: 'js/lib/hogan/hogan-3.0.2',
         xml2json: 'js/lib/xml2json/xml2json.min',
         queryString: 'js/lib/query-string/query-string',
@@ -82,7 +87,7 @@ requirejs.config({
 requirejs.config({
     config: {
         app: {
-            url: '/cgi-bin/mm/zoo_loader.cgi',
+            url: 'http://localhost/cgi-bin/mm/zoo_loader.cgi',
             delay: 3000,
         }
     }
