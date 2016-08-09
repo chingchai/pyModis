@@ -31,15 +31,15 @@
 define([
     'module', 'jquery', 'zoo', 'xml2json','ol'
 ], function(module, $, Zoo, X2JS,ol) {
-    
+
     var zoo = new Zoo({
         url: module.config().url,
         delay: module.config().delay,
     });
-    
+
     var mymodal = $('#myModal');
-    
-    
+
+
 
     function notify(text, type) {
         /*mynotify.notify({
@@ -47,7 +47,7 @@ define([
             type: type,
         }).show();*/
     }
-    
+
     function showModal(title, body) {
         mymodal.find('.modal-body').text('');
         mymodal.find('.modal-body').append(body);
@@ -91,7 +91,7 @@ define([
 					     null, true,onPopupClose);
 	map.addPopup(pop);
     }
-    
+
     function unSelect(){
 	if(pop)
 	    map.removePopup(pop);
@@ -171,7 +171,7 @@ define([
 	    inputs.push({"identifier":"BufferDistance","value":"1","dataType":"integer"})
 	}
 
-	    
+
 	console.log(inputs);
         zoo.execute({
             identifier: aProcess,
@@ -194,10 +194,10 @@ define([
 		notify('Execute failed:' +data.ExceptionReport.Exception.ExceptionText, 'danger');
             }
         });
-		
+
 	if(isChain2 && started)
 	    singleProcessing("BufferMask",hover_);
-	
+
     }
 
     function multiProcessing(aProcess) {
@@ -214,7 +214,7 @@ define([
 	//console.log(hover.getFeatures().item(0));
 	//litem=hover.getFeatures().item(0).clone();
 	//console.log(litem);
-	
+
 	val=GeoJSON.writeFeatures([hover.getSource().getFeatures()[0]],
 				      {dataProjection: 'EPSG:4326',
 				       featureProjection: 'EPSG:3857'});
@@ -253,16 +253,16 @@ define([
         });
 
     }
-    
+
     function activateService(){
 	try{
 	    $("#buttonBar").append('<a href="#" class="fg-button ui-state-default ui-text-only ui-corner-all single-process process" title="'+(arguments[0]!="SimpleChain2"?arguments[0]:"BufferRequestAndMask")+'" name="'+(arguments[0]!="SimpleChain2"?arguments[0]:"BufferRequestAndMask")+'" onclick="app.singleProcessing(\''+(arguments[0]!="SimpleChain2"?arguments[0]:"SimpleChain2")+'\');"> '+(arguments[0]!="SimpleChain2" && arguments[0]!="BufferMask" && arguments[0]!="BufferRequest"?arguments[0]:(arguments[0]!="BufferMask" && arguments[0]!="BufferRequest"?"Buffer Request and Mask":arguments[0]!="BufferRequest"?"Buffer Mask":"Buffer Request"))+' </a>');
-	    
+
 	    elist=$('.process');
 	    for(var i=0;i<elist.length;i++){
 		elist[i].style.display='none';
 	    }
-	    
+
 	}catch(e){
 	    alert(e);
 	}
@@ -294,10 +294,10 @@ define([
         }
     }
 
-    
+
     //
     var initialize = function() {
-        self = this;        
+        self = this;
 
      $(function(){
 
@@ -316,23 +316,34 @@ define([
           applyMargins();
         });
 
-	var main_url="http://zoo-project.org:8080/geoserver/ows";
+	//var main_url="http://zoo-project.org:8080/geoserver/ows";
+  var main_url="http://123.242.166.129:8080/geoserver/ows";
 	var proxy="http://zoo-project.org/cgi-bin/proxy.cgi?url="
-	var typename="topp:states";
+	//var typename="topp:states";
 
-	var wmsSource=new ol.source.ImageWMS({
+	var wmsSource1=new ol.source.ImageWMS({
 	    url: main_url,
-	    params: {'LAYERS': 'topp:states'},
+	    params: {'LAYERS': 'plkwater:modis_grid'},
 	    serverType: 'geoserver'
 	});
+
+  var wmsSource2=new ol.source.ImageWMS({
+      url: main_url,
+      params: {'LAYERS': ' 	plkwater:modis_point'},
+      serverType: 'geoserver'
+  });
+
 	var layers = [
 	    new ol.layer.Tile({
 		source: new ol.source.OSM()
 	    }),
 	    new ol.layer.Image({
 		//extent: [-13884991, 2870341, -7455066, 6338219],
-		source: wmsSource
-	    })
+		source: wmsSource1
+      }),
+      new ol.layer.Image({
+    source: wmsSource2
+      })
 	];
 	map = new ol.Map({
 	    layers: layers,
@@ -342,7 +353,7 @@ define([
 		zoom: 3
 	    })
 	});
-	
+
 	var parser = new ol.format.GeoJSON();
 	var style = new ol.style.Style({
 	    fill: new ol.style.Fill({
@@ -459,7 +470,7 @@ define([
 		console.log(features);
 		highlightOverlay.getSource().addFeatures(features);
 		console.log("ok");
-		
+
 		refreshDisplay();
 	    });
 	});
@@ -501,16 +512,16 @@ define([
     }
 
 
-    
+
     //
     var getCapabilities = function (params) {
-	
+
         //var target = $(params.target);
-        
+
         zoo.getCapabilities({
             type: params.method,
             success: function(data) {
-                
+
                 // Define some usefull functions for templating.
                 data.setUpIndex = function() {
                     return ++window['INDEX']||(window['INDEX']=0);
@@ -561,7 +572,7 @@ define([
             }
         });
     };
-    
+
     //
     var describeProcess = function(params) {
         //var target = $(params.target);
@@ -573,23 +584,23 @@ define([
                 var details =  tpl_describeProcess(data);
                 //target.text('');
                 //target.append(details);
-                
+
                 var title = 'DescribeProcess '+params.identifier;
                 showModal(title, details);
-                
+
             },
             error: function(data) {
                 notify('DescribeProcess failed', 'danger');
             }
         });
     };
-    
+
     //
     var executeSynchrone = function(params) {
         var target = $(params.target);
-        
+
         notify('Calling Execute synchrone ...', 'info');
-        
+
         zoo.execute({
           identifier: params.identifier,
           dataInputs: params.inputs ? JSON.parse(params.inputs) : null,
@@ -601,7 +612,7 @@ define([
             var details =  tpl_executeResponse(data);
             target.text('');
             target.append(details);
-            
+
             var output = data.ExecuteResponse.ProcessOutputs.Output;
             console.log('======== OUTPUT ========');
             console.log(output);
@@ -623,7 +634,7 @@ define([
                             'ProcessDescriptions.ProcessDescription.ProcessOutputs.Output',
                             'ProcessDescriptions.ProcessDescription.ProcessOutputs.Output.ComplexOutput.Supported.Format',
                             'Capabilities.ServiceIdentification.Keywords'
-                            ],   
+                            ],
                         });
                         showModal('Execute '+params.identifier, _x2js.json2xml_str(output.Data.ComplexData));
                     }
@@ -637,15 +648,15 @@ define([
             notify('Execute failed:' +data.ExceptionReport.Exception.ExceptionText, 'danger');
           }
         });
-        
+
     };
-    
+
     //
     var executeAsynchrone = function(params) {
         var target = $(params.target);
-        
+
         notify('Calling Execute asynchrone ...', 'info');
-        
+
         zoo.execute({
           identifier: params.identifier,
           dataInputs: params.inputs ? JSON.parse(params.inputs) : null,
@@ -653,24 +664,24 @@ define([
           type: params.method,
           storeExecuteResponse: true,
           status: true,
-          
+
           success: function(data) {
             console.log("**** SUCCESS ****");
             notify('Execute succeded', 'success');
             var details =  tpl_executeResponse_async(data);
             target.text('');
-            target.append(details);          
+            target.append(details);
           },
           error: function(data) {
             notify('Execute failed', 'danger');
           }
         });
-        
+
     }
-    
+
     //
     var longProcessDemo = function(params) {
-        
+
         var progress = $(params.target);
         progress.removeClass("progress-bar-success").addClass("progress-bar-info");
 
@@ -694,16 +705,16 @@ define([
 
                     progress.css('width', (data.percentCompleted)+'%');
                     progress.text(data.text+' : '+(data.percentCompleted)+'%');
-                    
+
                 },
                 onProcessSucceeded: function(data) {
                     //console.log("**** ProcessSucceeded ****");
                     //console.log(data);
-                    
+
                     progress.css('width', (100)+'%');
                     progress.text(data.text+' : '+(100)+'%');
                     progress.removeClass("progress-bar-info").addClass("progress-bar-success");
-                    
+
                     // TODO: multiple output
                     if (data.result.ExecuteResponse.ProcessOutputs) {
                         var output = data.result.ExecuteResponse.ProcessOutputs.Output;
@@ -717,14 +728,14 @@ define([
                     console.log("**** onError ****");
                     console.log(data);
                     notify("Execute asynchrone failed", 'danger');
-                },        
+                },
             });
           },
           error: function(data) {
             console.log("**** ERROR ****");
             console.log(data);
             notify("Execute asynchrone failed", 'danger');
-            
+
           },
 
         });
@@ -745,4 +756,3 @@ define([
 
 
 });
-
