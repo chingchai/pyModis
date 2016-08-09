@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css"/>
     <link href="http://fonts.googleapis.com/css?family=Days+One" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="assets/css/style_zoo.css" />
-    <title>Bringing pyModis to the web through ZOO-Project.[Demo]</title>
+    <title>Bringing pyModis to the web through ZOO-Project</title>
     <script data-main="assets/js/pymodis-py" src="assets/js/lib/require.js"></script>
  </head>
   <body>
@@ -28,7 +28,19 @@
             <span class="pm-demo-title">ZOO-Project | <span class="hidden-xs">Bringing pyModis to the web through ZOO-Project</span></span>
           </div>
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+      <div class="nav navbar-nav col-sm-2">
+      <select id="serviceIdentifier" class="form-control" style="margin-top:0.5em">
+        <option value="modis.download">Modis Download</option>
+        <option value="modis.mosaic">Modis Mosaic</option>
+        <option value="modis.convert">Modis Convert</option>
+      </select>
+      </div>
+
+
             <ul class="nav navbar-nav navbar-right">
+
+
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle"
                 data-toggle="dropdown"><i class="fa fa-info-circle"></i> <b class="caret"></b></a>
@@ -40,306 +52,62 @@
                 </ul>
               </li>
             </ul>
-            </div><!-- /.navbar-collapse -->
-            </div><!-- /.container-fluid -->
+            </div> <!-- /.navbar-collapse -->
+            </div> <!-- /.container-fluid -->
           </nav>
         </div>
       </nav>
+
       <div class="navbar-offset"></div>
       <div id="map">
       </div>
+
       <div class="row main-row">
         <div class="col-sm-5 col-md-4 sidebar sidebar-left pull-left">
           <div class="panel-group sidebar-body" id="accordion-left">
             <div class="panel panel-default">
               <div class="panel-heading">
                 <h4 class="panel-title">
-                  <a data-toggle="collapse" href="#download">
+                  <a data-toggle="collapse" href="#layers">
                     <i class="fa fa-gears"></i>
-                    Download Modis Service parameters
+                    Modis Services parameters
                   </a>
                   <span class="pull-right slide-submenu">
                     <i class="fa fa-chevron-left"></i>
                   </span>
                 </h4>
               </div>
-              <div id="download" class="panel-collapse collapse in" style="overflow:auto">
-                <!--<div class="panel-body" style="overflow:auto"-->
-				<div class="panel-body" style="overflow: auto; height: 200px; max-height: 200px;">
-				<div data-role="popup" id="wps_Modis_Download" data-dismissible="false" data-overlay-theme="a" data-theme="c" class="pm-popup  ui-corner-all clearfix">
-					<div data-role="header" data-theme="a" class="ui-corner-top">
-					  <h3 id="run-wps-header">Modis Download</h3>
-					</div>
-					<div data-role="content" data-theme="d" class="ui-corner-bottom
-					  ui-content">
-					  <h4>Download MODIS Land Surface Temperature(LST)</h4>
-					  <p>Downloads MODIS data from NASA FTP servers. It can download large amounts of data and it can be profitably used with cron jobs to receive data with a fixed delay of time.</p>
-					<div class="ui-field-contain">
-					  <h4>DataInputs</h4>
-
-					<div data-role="content" data-theme="d" class="ui-corner-bottom
-					  ui-content col-sm-12">
-					  <label for="wps_i_in">in</label>
-					  <span class="wps-title">Input path directory on the http/ftp.</span>
-					  <select type="text" class="form-control" name="wps_i_in" id="wps_i_in" data-ltype="string" value="" placeholder="type
-						..." data-clear-btn="true" data-mini="true">
-						 <option>MOLT</option>
-						 <option>MOLA</option>
-						 <option>MOTA</option>
-						</select>
-					 	<input type="text" name="wps_i_in" id="wps_i_in" class="form-control hide" data-ltype="string" value="MOLT" placeholder="type
-						..." data-clear-btn="true" data-mini="true">
-					  <p></p>
-					  </div>
-
-					<div data-role="content" data-theme="d" class="ui-corner-bottom
-					  ui-content col-sm-12">
-					  <label for="wps_i_product">product</label>
-					  <span class="wps-title">Input product name as on the http/ftp server.</span>
-					  <input type="text" name="wps_i_product" id="wps_i_product" class="form-control " data-ltype="string" value="MOD11A1.005" placeholder="type
-						..." data-clear-btn="true" data-mini="true">
-					  <p></p>
-					  </div>
-
-					<div data-role="content" data-theme="d" class="ui-corner-bottom
-					  ui-content col-sm-12">
-					  <label for="wps_i_tiles">tiles</label>
-					  <span class="wps-title">Input a set of tiles to be downloaded.</span>
-					  <input type="text" name="wps_i_tiles" id="wps_i_tiles" class="form-control " data-ltype="string" value="h27v07,h28v07" placeholder="type
-						..." data-clear-btn="true" data-mini="true">
-					  <p></p>
-					  </div>
-
-					<div data-role="content" data-theme="d" class="ui-corner-bottom
-					  ui-content col-sm-12">
-					  <label for="wps_i_today">today</label>
-					  <span class="wps-title">Input the day to start downloading.</span>
-					  <input type="text" name="wps_i_today" id="wps_i_today" class="form-control " data-ltype="string" value="2015-01-01" placeholder="type
-						..." data-clear-btn="true" data-mini="true">
-					  <p></p>
-					  </div>
-
-					<div data-role="content" data-theme="d" class="ui-corner-bottom
-					  ui-content col-sm-12">
-					  <label for="wps_i_enddate">enddate</label>
-					  <span class="wps-title">Input the day to end downloading.</span>
-					  <input type="text" name="wps_i_enddate" id="wps_i_enddate" class="form-control " data-ltype="string" value="2015-01-31" placeholder="type
-						..." data-clear-btn="true" data-mini="true">
-					  <p></p>
-					  </div>
-
-					  <!-- output modis download -->
-					  <h4>ProcessOutputs</h4>
-					  <div class="col-sm-12">
-					  <label for="wps_o_out">out</label>
-					  <span class="wps-title">Output Modis Download.</span>
-					  <select data-lid="out" class="form-control" id="format_wps_o_out">
-						<option>application/zip</option>
-					  </select>
-					  </div>
-
-					  </div>
-					  <div class="col-sm-12" style="margin-top:0.5em">
-						<div class="col-sm-3"><button id="btn-wps-execute" href="#" data-rel="close" class="btn btn-default" style="margin-left:
-						  0px !important;">Execute</button>
-						</div>
-						<div class="col-md-19">
-						  <div class="progress" style="margin-top: 0.5em;">
-							<div id="progress-process" class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
-							  <span class="sr-only"></span>
-							</div>
-						  </div>
-						</div>
-					  </div>
-					  <div id="infoMessage" class="col-sm-12" style="margin-top:0.5em">
-
-					  </div>
-
-					</div>
-					</div></div>
-			<!-- end download modis toolbox -->
-                </div>
-              </div>
-
-
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h4 class="panel-title">
-                  <a data-toggle="collapse" href="#mosaic">
-                    <i class="fa fa-gears"></i>
-                    Mosic Modis Service parameters
-                  </a>
-                </h4>
-              </div>
-              <div id="mosaic" class="panel-collapse collapse in" style="overflow:auto">
-			<div class="panel-body" style="overflow: auto; height: 200px; max-height: 200px;">
-				<div data-role="popup" id="wps_Modis_Mosaic" data-dismissible="false" data-overlay-theme="a" data-theme="c" class="pm-popup  ui-corner-all clearfix">
-					<div data-role="header" data-theme="a" class="ui-corner-top">
-					  <h3 id="run-wps-header">Modis Mosaic</h3>
-					</div>
-					<div data-role="content" data-theme="d" class="ui-corner-bottom
-					  ui-content">
-					  <h4>Mosic Modis Service</h4>
-					  <p>Mosaic modis data from hdf to GDAL formats using GDAL.</p>
-					<div class="ui-field-contain">
-					  <h4>DataInputs</h4>
-
-					<div data-role="content" data-theme="d" class="ui-corner-bottom
-					  ui-content col-sm-12">
-					  <label for="wps_m_tiles">tiles</label>
-					  <span class="wps-title">Input tiles.</span>
-					  <!--<input type="hidden" name="file" id="wps_m_tiles" value="http://myhost.net/tmp/6455ab26-403d-11e6-ae02-0800274bb48f.zip">-->
-					  <input type="text" name="wps_m_tiles" id="wps_m_tiles" class="form-control " data-ltype="string" value="http://myhost.net/tmp/6455ab26-403d-11e6-ae02-0800274bb48f.zip" placeholder="type
-						..." data-clear-btn="true" data-mini="true">
-					  <p></p>
-					  </div>
-
-					  <!-- output modis download -->
-					  <h4>ProcessOutputs</h4>
-					  <div class="col-sm-12">
-					  <label for="wps_o_out">out</label>
-					  <span class="wps-title">Output Modis Mosaic image.</span>
-					  <select data-lid="out" class="form-control" id="format_wps_o_out">
-						<option>image/tiff</option>
-						<option>image/png</option>
-						<option>text/xml</option>
-					  </select>
-					  </div>
-
-					  </div>
-					  <div class="col-sm-12" style="margin-top:0.5em">
-						<div class="col-sm-3"><button id="btn-wps-execute" href="#" data-rel="close" class="btn btn-default" style="margin-left:
-						  0px !important;">Execute</button>
-						</div>
-						<div class="col-md-19">
-						  <div class="progress" style="margin-top: 0.5em;">
-							<div id="progress-process" class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
-							  <span class="sr-only"></span>
-							</div>
-						  </div>
-						</div>
-					  </div>
-					  <div id="infoMessage" class="col-sm-12" style="margin-top:0.5em">
-
-					  </div>
-
-					</div>
-					</div></div>
-			<!-- end mosaic modis toolbox -->
-
-                </div>
-              </div>
-
-
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h4 class="panel-title">
-                  <a data-toggle="collapse" href="#convert">
-                    <i class="fa fa-gears"></i>
-                    Convert Modis Service parameters
-                  </a>
-                </h4>
-              </div>
-              <div id="convert" class="panel-collapse collapse in" style="overflow:auto">
-			<div class="panel-body" style="overflow: auto; height: 200px; max-height: 200px;">
-				<div data-role="popup" id="wps_Modis_Mosaic" data-dismissible="false" data-overlay-theme="a" data-theme="c" class="pm-popup  ui-corner-all clearfix">
-					<div data-role="header" data-theme="a" class="ui-corner-top">
-					  <h3 id="run-wps-header">Convert Mosaic</h3>
-					</div>
-					<div data-role="content" data-theme="d" class="ui-corner-bottom
-					  ui-content">
-					  <h4>Convert Modis Service</h4>
-					  <p>Convert Modis data from hdf to GDAL formats.</p>
-					<div class="ui-field-contain">
-					  <h4>DataInputs</h4>
-
-					<div data-role="content" data-theme="d" class="ui-corner-bottom
-					  ui-content col-sm-12">
-					  <label for="wps_c_tiles">tiles</label>
-					  <span class="wps-title">Input tiles.</span>
-					  <!--<input type="hidden" name="file" id="wps_c_tiles" value="http://myhost.net/tmp/6455ab26-403d-11e6-ae02-0800274bb48f.zip">-->
-					  <input type="text" name="wps_c_tiles" id="wps_c_tiles" class="form-control " data-ltype="string" value="http://myhost.net/tmp/6455ab26-403d-11e6-ae02-0800274bb48f.zip" placeholder="type
-						..." data-clear-btn="true" data-mini="true">
-					  <p></p>
-					  </div>
-
-					<div data-role="content" data-theme="d" class="ui-corner-bottom
-					  ui-content col-sm-12">
-					  <label for="wps_c_res">res</label>
-					  <span class="wps-title">Input for output resolution.</span>
-					  <input type="text" name="wps_c_res" id="wps_c_res" class="form-control " data-ltype="integer" value="1000" placeholder="type
-						..." data-clear-btn="true" data-mini="true">
-					  <p></p>
-					  </div>
-
-					<div data-role="content" data-theme="d" class="ui-corner-bottom
-					  ui-content col-sm-12">
-					  <label for="wps_c_epsg">epsg</label>
-					  <span class="wps-title">Input the EPSG code for the preojection of output file.</span>
-					  <input type="text" name="wps_c_epsg" id="wps_c_epsg" class="form-control " data-ltype="integer" value="32647" placeholder="type
-						..." data-clear-btn="true" data-mini="true">
-					  <p></p>
-					  </div>
-
-					  <!-- output convert download -->
-					  <h4>ProcessOutputs</h4>
-					  <div class="col-sm-12">
-					  <label for="wps_o_out">out</label>
-					  <span class="wps-title">Output Modis Convert.</span>
-					  <select data-lid="out" class="form-control" id="format_wps_o_out">
-						<option>application/zip</option>
-					  </select>
-					  </div>
-
-					  </div>
-					  <div class="col-sm-12" style="margin-top:0.5em">
-						<div class="col-sm-3"><button id="btn-wps-execute" href="#" data-rel="close" class="btn btn-default" style="margin-left:
-						  0px !important;">Execute</button>
-						</div>
-						<div class="col-md-19">
-						  <div class="progress" style="margin-top: 0.5em;">
-							<div id="progress-process" class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
-							  <span class="sr-only"></span>
-							</div>
-						  </div>
-						</div>
-					  </div>
-					  <div id="infoMessage" class="col-sm-12" style="margin-top:0.5em">
-
-					  </div>
-
-					</div>
-					</div></div>
-			<!-- end convert modis toolbox -->
-
-              </div>
-            </div>
-
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h4 class="panel-title">
-                  <a data-toggle="collapse" href="#properties">
-                    <i class="fa fa-info-circle"></i>
-                    Information
-                  </a>
-                </h4>
-              </div>
-              <div id="properties" class="panel-collapse collapse in">
-                <div class="panel-body">
-                  <p>
-                 This map demonstrates some of the pyModis WPS
-            services. Please see <a
-            href="./assets/js/pymodis-py.js" target="_blank">pymodis-py.js</a> for global configuration and
-            definition of required JS files. For information relatives
-            to the application itself, refer to the <a
-            href="./assets/js/pymodis-py-app.js" target="_blank">pymodis-py-app.js</a> file.
-                  </p>
-
+              <div id="layers" class="panel-collapse collapse in" style="overflow:auto">
+                <div class="panel-body" style="overflow:auto">
 
 
                 </div>
               </div>
             </div>
+
+
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                  <a data-toggle="collapse" href="#layers_display">
+                    <i class="fa fa-list-alt"></i>
+                    Layers
+                  </a>
+                </h4>
+              </div>
+              <div id="layers_display" class="panel-collapse collapse in" style="overflow:auto">
+                <div class="panel-body" style="overflow:auto">
+
+            		  <ul class="list-group">
+            		    <li class="list-group-item layerItem"><input
+            		    name="name" type="checkbox" checked="checked"
+            		    disabled="disabled" /> Modis Layer</li>
+            		  </ul>
+                </div>
+              </div>
+            </div>
+
+
           </div>
         </div>
       </div>
@@ -367,14 +135,6 @@
     </div>
   </div>
 </div>
-
-<script type="txt/template" id="addLayer_template">
-  <li class="list-group-item layerItem">
-   lcheck
-   <a href="ldata" class="accessLayer" target="_blank"> lname </a>
-   <a href="#" class="pull-right removeLayer"><i class="fa fa-close"></i></a>
-  </li>
-</script>
 
   </body>
 </html>
