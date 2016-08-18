@@ -793,8 +793,10 @@ Status: 200 OK
 ![screenshot](http://i.imgur.com/VwDv6cz.png "Result convert modis Zipfile")
 
 ## Create the template by use the web application to automatically generate the HTML form for accessing pyModis WPS services.
-first version template: https://github.com/chingchai/pyModis/tree/gsoc-2016/zoo-pymodis/app-service-web/appmodis
-![screenshot](http://i.imgur.com/roZADkz.png "first version template web application")
+Template web application: https://github.com/chingchai/pyModis/tree/gsoc-2016/zoo-pymodis/app-service-web/appmodis
+![screenshot](http://i.imgur.com/hgg4PGb.png "modis module")
+
+![screenshot](http://i.imgur.com/aaqvBo4.png "wms layer")
 
 ## ZOO Wiki
   - [ZOO-Wiki](http://zoo-project.org/trac/wiki/Bringing_pyModis_to_the_web_through_ZOO-Project_GSoC_2016)
