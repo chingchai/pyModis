@@ -12,6 +12,8 @@ def download(conf,inputs,outputs):
     # Create a temporary directory to store the downloaded files
     storeDir = os.path.join(conf["main"]["tmpPath"],conf["lenv"]["usid"])
     dns = storeDir #dest = "/home/chingchai/lab-pyModis/lst_terra/"
+    password = "Framus00076551"
+    user = "chingchai"
     path = inputs["path"]["value"] # MOLA, MOLT or MOTA
     tiles = inputs["tiles"]["value"]
     #tiles = ",".join(inputs["tiles"]["value"]) #"h27v07,h27v08,h28v07,h28v08" Thailand extent
@@ -20,7 +22,7 @@ def download(conf,inputs,outputs):
     product = inputs["product"]["value"] #"MCD43B4.005","MOD11A1.005"
 
     os.makedirs(dns)
-    down = downmodis.downModis(destinationFolder=dns, url='http://e4ftl01.cr.usgs.gov', path=path, tiles=tiles, today=today, enddate=enddate, product=product)
+    down = downmodis.downModis(destinationFolder=dns, password=password, user=user, url='http://e4ftl01.cr.usgs.gov', path=path, tiles=tiles, today=today, enddate=enddate, product=product)
     down.connect()
     down.downloadsAllDay()
 
@@ -82,6 +84,7 @@ def convert(conf,inputs,outputs):
 
     modisconv = convertmodis_gdal.convertModisGDAL(hdfname=files[0], prefix=output_pref, subset=[1,1,1,1,1,1,1,1,1,1,1,1], res=res, epsg=epsg)
     modisconv.run()
+
     d=zipfile.ZipFile(os.path.join(conf["main"]["tmpPath"],conf["lenv"]["usid"]+".zip"), 'w')
     for name in glob.glob(os.path.join(conf["main"]["tmpPath"],conf["lenv"]["usid"],"*.tif")):
         if name.count("zip")==0:
