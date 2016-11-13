@@ -52,10 +52,15 @@ import ftplib
 import requests
 
 # urllib in python 2 and 3
-from future.standard_library import install_aliases
-install_aliases()
+try:
+    from future.standard_library import install_aliases
+    install_aliases()
+except ImportError:
+    raise ImportError("Future library not found, please install it")
 from urllib.request import urlopen
-
+import urllib.request
+import urllib.error
+from base64 import b64encode
 from html.parser import HTMLParser
 import re
 
@@ -111,7 +116,6 @@ def str2date(datestring):
     """Convert to datetime.date object from a string
 
        :param str datestring string with format (YYYY-MM-DD)
-
        :return: a datetime.date object representing datestring
     """
     if '-' in datestring:
@@ -121,6 +125,11 @@ def str2date(datestring):
     elif ' ' in datestring:
         stringSplit = datestring.split(' ')
     return date(int(stringSplit[0]), int(stringSplit[1]), int(stringSplit[2]))
+
+
+class ModisHTTPRedirectHandler(urllib.request.HTTPRedirectHandler):
+    def http_error_302(self, req, fp, code, msg, headers):
+        return urllib.request.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
 
 
 class modisHtmlParser(HTMLParser):
@@ -215,7 +224,7 @@ class downModis:
        :param int timeout: Timeout value for HTTP server (seconds)
        :param bool checkgdal: variable to set the GDAL check
     """
-    def __init__(self, destinationFolder, password="ChingChai00076551", user="chingchaih",
+    def __init__(self, destinationFolder, password=None, user="anonymous",
                  url="http://e4ftl01.cr.usgs.gov", tiles=None, path="MOLT",
                  product="MOD11A1.005", today=None, enddate=None, delta=10,
                  jpg=False, debug=False, timeout=30, checkgdal=True):
@@ -231,9 +240,16 @@ class downModis:
         else:
             raise IOError("The url should contain 'ftp://' or 'http://'")
         # user for download using ftp
-        self.user = user
+        self.user = "chingchaih"
         # password for download using ftp
-        self.password = password
+        self.password = "ChingChai00076551"
+        self.userpwd = "{us}:{pw}".format(us=self.user,
+                                          pw=self.password)
+        userAndPass = b64encode(str.encode(self.userpwd)).decode("ascii")
+        self.http_header = { 'Authorization' : 'Basic %s' %  userAndPass }
+        cookieprocessor = urllib.request.HTTPCookieProcessor()
+        opener = urllib.request.build_opener(ModisHTTPRedirectHandler, cookieprocessor)
+        urllib.request.install_opener(opener)
         # the product (product_code.004 or product_cod.005)
         self.product = product
         self.product_code = product.split('.')[0]
@@ -572,6 +588,12 @@ class downModis:
         """
         # different return if this method is used from downloadsAllDay() or
         # moveFile()
+        if not listNewFile and not self.fileInPath:
+            logging.error("checkDataExist both lists are empty")
+        elif not listNewFile:
+            listNewFile = list()
+        elif not self.fileInPath:
+            self.fileInPath = list()
         if not move:
             listOfDifferent = list(set(listNewFile) - set(self.fileInPath))
         elif move:
@@ -613,25 +635,27 @@ class downModis:
         """
         filSave = open(filHdf, "wb")
         try:  # download and write the file
-            try:  # use request module
-                http = requests.get(urljoin(self.url, self.path, day, filDown))
-                orig_size = http.headers['content-length']
-                filSave.write(http.content)
-            except:  # use urllib module
-                http = urlopen(urljoin(self.url, self.path, day,
-                                               filDown))
-                orig_size = http.headers['content-length']
-                filSave.write(http.read())
-
+            url = urljoin(self.url, self.path, day, filDown)
+            req = urllib.request.Request(url, headers = self.http_header)
+            http = urllib.request.urlopen(req)
+            orig_size = http.headers['Content-Length']
+            filSave.write(http.read())
         # if local file has an error, try to download the file again
         except:
             logging.error("Cannot download {name}. "
                           "Retrying...".format(name=filDown))
             filSave.close()
             os.remove(filSave.name)
+            import time
+            time.sleep(5)
             self._downloadFileHTTP(filDown, filHdf, day)
         filSave.close()
         transf_size = os.path.getsize(filSave.name)
+        if not orig_size:
+            if self.debug:
+                logging.debug("File {name} downloaded but not "
+                              "check the size".format(name=filDown))
+            return 0
         if int(orig_size) == int(transf_size):
             # if no xml file, delete the HDF and redownload
             if filHdf.find('.xml') == -1:
