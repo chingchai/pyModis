@@ -1,0 +1,62 @@
+[modtool]
+ Title = Development of an Automated Web Processing Service to Drought Monitoring Based on pyModis and ZOO-Project.
+ Abstract = pyModis and GRASS GIS based on WPS using ZOO-Project platform.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = modzoo
+ serviceType = Python
+ <MetaData>
+   title = Calculate NDVI, NDWI and, NDDI from MODIS data.
+ </MetaData>
+
+ <DataInputs>
+  [exec]
+   Title = Input MODIS data from pyModis.
+   Abstract = The Name.
+   minOccurs = 1
+   maxOccurs = 1
+   <MetaData>
+    title = Input MODIS data from pyModis.
+   </MetaData>
+   <LiteralData>
+    DataType = string
+    <Default>
+     UOM = meter
+    </Default>
+    <Supported>
+     UOM = meter
+    </Supported>
+   </LiteralData>
+
+  [nddi]
+   Title = Input string
+   Abstract = Calculate NDDI
+   minOccurs = 1
+   maxOccurs = 1
+   <MetaData>
+    title = nddi
+   </MetaData>
+   <LiteralData>
+    DataType = string
+    <Default>
+     UOM = meter
+    </Default>
+    <Supported>
+     UOM = meter
+    </Supported>
+   </LiteralData>
+
+ </DataInputs>
+
+<DataOutputs>
+  [Result]
+   Title = The resulting string
+   Abstract = The hello message containing the input string
+   <ComplexData>
+   <LiteralData>
+       dataType = string
+       <Default />
+   </LiteralData>
+   </ComplexData>
+ </DataOutputs>
